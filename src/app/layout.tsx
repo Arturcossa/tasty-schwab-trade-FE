@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/app-sidebar";
 import AppBreadCrumb from "@/components/app-breadcrumb";
 import { Toaster } from "@/components/ui/sonner";
+import PlayButtons from "@/components/play-buttons";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,10 +41,11 @@ export default function RootLayout({
             <div className="flex items-center gap-4">
               <SidebarTrigger />
               <AppBreadCrumb />
+              <PlayButtons />
             </div>
             {children}
           </main>
-          <Toaster />
+          <Toaster position="top-center" richColors />
         </SidebarProvider>
       </body>
     </html>

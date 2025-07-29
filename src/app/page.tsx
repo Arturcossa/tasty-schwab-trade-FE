@@ -1,13 +1,7 @@
-'use client'
-
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  const navigate = useRouter();
-  useEffect(() => {
-    navigate.push("/strategy-control")
-  }, [navigate])
+  redirect('/strategy-control')
 
   return (
     <></>
