@@ -26,7 +26,7 @@ export default function LoginPage() {
       });
       router.push("/");
     } else {
-      toast.error("Invalid email or password!", {
+      toast.error(`${res.message}`, {
         className: "toast-error"
       });
     }

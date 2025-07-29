@@ -16,6 +16,7 @@ import {
 import { Button } from "./ui/button";
 import { LayoutDashboard, KeyRound, Zap, LogOut } from "lucide-react";
 import Image from "next/image";
+import { useAuth } from "./AuthContext";
 
 const menuItems = [
   {
@@ -37,6 +38,7 @@ const menuItems = [
 
 const AppSidebar = () => {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <Sidebar className="font-playfair">
@@ -70,7 +72,7 @@ const AppSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <div className="flex flex-col items-center gap-2 w-full px-4 pb-4">
-          <Button variant="outline" className="w-full flex items-center gap-2 font-semibold text-base">
+          <Button variant="outline" className="w-full flex items-center gap-2 font-semibold text-base" onClick={logout}>
             <LogOut size={18} />
             Log out
           </Button>
