@@ -22,3 +22,9 @@ export const timeframes = [
   "1160t",
   "1600t"
 ]
+
+export const trendline = [
+  'EMA',
+  'SMA',
+  'WilderSmoother'
+]

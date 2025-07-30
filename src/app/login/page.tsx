@@ -1,19 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoaderIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,13 +31,18 @@ export default function LoginPage() {
       toast.success("Successful login!", {
         className: "toast-success"
       });
-      router.push("/");
+      router.push("/dashboard");
     } else {
       toast.error(`${res.message}`, {
         className: "toast-error"
       });
     }
   };
+
+  // Don't render if user is already logged in
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">

@@ -9,8 +9,11 @@ import React, {
 } from "react";
 
 interface AuthContextType {
-  user: { email: string } | null;
-  login: (email: string, password: string) => Promise<{
+  user: { email: string; token: string } | null;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{
     success: boolean;
     token?: string;
     message?: string;
@@ -29,12 +32,15 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<{ email: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; token: string } | null>(
+    null
+  );
 
   useEffect(() => {
     const storedUser = localStorage.getItem("TIM_USER");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem("TIM_TOKEN");
+    if (storedUser && storedToken) {
+      setUser({ email: JSON.parse(storedUser), token: storedToken });
     }
   }, []);
 
@@ -48,13 +54,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           body: JSON.stringify({ email, password }),
         }
       );
-      console.log("res", res)
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setUser({ email });
+        setUser({ email: email, token: data.token });
         localStorage.setItem("TIM_USER", JSON.stringify({ email }));
         localStorage.setItem("TIM_TOKEN", data.token);
+        localStorage.setItem("TIM_REFRESH_TOKEN", data.refreshToken)
         return { success: true, token: data.token };
       }
       return {

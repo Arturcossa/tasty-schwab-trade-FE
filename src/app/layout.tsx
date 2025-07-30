@@ -5,9 +5,8 @@ import AppSidebar from "@/components/app-sidebar";
 import AppBreadCrumb from "@/components/app-breadcrumb";
 import { Toaster } from "@/components/ui/sonner";
 import PlayButtons from "@/components/play-buttons";
-import { AuthProvider, useAuth } from "@/components/AuthContext";
-import LoginPage from "./login/page";
-import AuthGate from "@/components/authgate";
+import { AuthProvider } from "@/context/AuthContext";
+import { TradingProvider } from "@/context/TradingContext";
 
 export const metadata: Metadata = {
   title: "Trading Bot",
@@ -26,20 +25,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <AuthGate>
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="w-full py-5 px-5">
-                <div className="flex items-center gap-4">
-                  <SidebarTrigger />
-                  <AppBreadCrumb />
-                  <PlayButtons />
-                </div>
-                {children}
-              </main>
-            </SidebarProvider>
-          </AuthGate>
-          <Toaster position="top-right" richColors />
+          <TradingProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </TradingProvider>
         </AuthProvider>
       </body>
     </html>

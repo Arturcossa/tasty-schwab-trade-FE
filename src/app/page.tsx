@@ -1,5 +1,20 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
-  redirect("/strategy-control");
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    } else {
+      router.push("/dashboard");
+    }
+  }, [user, router]);
+
+  return <></>;
 }

@@ -23,9 +23,9 @@ import { Pencil, Trash2, Check, X } from "lucide-react";
 import { timeframes } from "@/lib/ema-datas";
 
 const trendlineOptions = [
-  { value: "ema", label: "EMA" },
-  { value: "sma", label: "SMA" },
-  { value: "wilder", label: "Wilder" },
+  { value: "EMA", label: "EMA" },
+  { value: "SMA", label: "SMA" },
+  { value: "WilderSmoother", label: "Wilder Smoother" },
 ];
 
 type TradingRow = {
@@ -47,9 +47,9 @@ const TradingParameters = ({
       symbol: "AAPL",
       enabled: "true",
       timeFrame: "1Day",
-      trendline1: "ema",
+      trendline1: "EMA",
       period1: 9,
-      trendline2: "sma",
+      trendline2: "SMA",
       period2: 21,
       schwabQty: 10,
       tastyQty: 5,

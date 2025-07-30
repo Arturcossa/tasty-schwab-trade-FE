@@ -12,61 +12,147 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/context/AuthContext";
 import { symbols, timeframes } from "@/lib/ema-datas";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { LoaderIcon } from "lucide-react";
+import { EmaTicker } from "@/lib/type";
+import { useTrading } from "@/context/TradingContext";
+import { convertBackendDataToEmaArray } from "@/lib/functions";
 
 const AddNewTicker = () => {
-  const [symbol, setSymbol] = useState("");
-  const [enabled, setEnabled] = useState("false");
-  const [timeFrame, setTimeFrame] = useState("");
-  const [trendline1, setTrendline1] = useState("ema");
-  const [period1, setPeriod1] = useState<number>(1);
-  const [trendline2, setTrendline2] = useState("ema");
-  const [period2, setPeriod2] = useState<number>(1);
-  const [schwabQty, setSchwabQty] = useState<number>(0);
-  const [tastyQty, setTastyQty] = useState<number>(0);
+  const { user } = useAuth();
+  const { tickerData, setTickerData } = useTrading();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handlePeriod1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value, 10);
-    if (!isNaN(val) && val > 0) setPeriod1(val);
-    else if (e.target.value === "") setPeriod1(1);
+  // TODO
+  useEffect(() => {
+    console.log("ticker ", tickerData)
+  }, [tickerData])
+
+  // Form state
+  const [formData, setFormData] = useState<EmaTicker>({
+    symbol: "",
+    trade_enabled: false,
+    timeframe: "",
+    trend_line_1: "EMA",
+    period_1: 1,
+    trend_line_2: "EMA",
+    period_2: 1,
+    schwab_quantity: 1,
+    tastytrade_quantity: 1,
+  });
+
+  // Update form data helper
+  const updateFormData = (field: keyof EmaTicker, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const incrementPeriod1 = () => setPeriod1((prev) => prev + 1);
-  const decrementPeriod1 = () =>
-    setPeriod1((prev) => (prev > 1 ? prev - 1 : 1));
-
-  const handlePeriod2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value, 10);
-    if (!isNaN(val) && val > 0) setPeriod2(val);
-    else if (e.target.value === "") setPeriod2(1);
+  // Period handlers with validation
+  const handlePeriodChange = (field: "period_1" | "period_2", value: string) => {
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue > 0) {
+      updateFormData(field, numValue);
+    } else if (value === "") {
+      updateFormData(field, 1);
+    }
   };
 
-  const incrementPeriod2 = () => setPeriod2((prev) => prev + 1);
-  const decrementPeriod2 = () =>
-    setPeriod2((prev) => (prev > 1 ? prev - 1 : 1));
+  // Form validation
+  const validateForm = (): string | null => {
+    if (!formData.symbol) return "Please select a symbol";
+    if (!formData.timeframe) return "Please select a time frame";
+    if (formData.period_1 < 1) return "Period 1 must be greater than 0";
+    if (formData.period_2 < 1) return "Period 2 must be greater than 0";
+    if (formData.schwab_quantity <= 0) return "Schwab quantity must be greater than 0";
+    if (formData.tastytrade_quantity <= 0) return "TastyTrade quantity must be greater than 0";
+    return null;
+  };
 
-  const handleAddTicker = () => {
-    if (!symbol) {
-      return toast.warning("Select a symbol!");
-    } else if (!timeFrame) {
-      return toast.warning("Select a time frame!");
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      symbol: "",
+      trade_enabled: false,
+      timeframe: "",
+      trend_line_1: "EMA",
+      period_1: 1,
+      trend_line_2: "EMA",
+      period_2: 1,
+      schwab_quantity: 1,
+      tastytrade_quantity: 1,
+    });
+  };
+
+  const handleAddTicker = async () => {
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
+      toast.warning(validationError, {
+        className: "toast-warning"
+      });
+      return;
     }
 
-    
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add-ticker`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("TIM_TOKEN")}`,
+          },
+          body: JSON.stringify({
+            ...formData,
+            userId: user?.email,
+            strategy: "ema",
+          }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok && data.success && data.data) {
+        toast.success("Ticker added successfully!", {
+          className: "toast-success",
+        });
+        const emaArray = convertBackendDataToEmaArray(data.data);
+        setTickerData({
+          ...tickerData,
+          ema: emaArray,
+        })
+        resetForm();
+      } else {
+        toast.error(data.message || "Failed to add ticker", {
+          className: "toast-error",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding ticker:", error);
+      toast.error("Network error. Please try again.", {
+        className: "toast-error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <h2 className="font-semibold text-xl">
         Trading Parameters Configuration
       </h2>
       <Card>
-        <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-5">
-          <div className="space-y-1">
-            <h3>Ticker Symbol</h3>
-            <Select value={symbol} onValueChange={setSymbol}>
+        <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 pt-6">
+          {/* Symbol Selection */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Ticker Symbol</h3>
+            <Select
+              value={formData.symbol}
+              onValueChange={(value) => updateFormData("symbol", value)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a symbol" />
               </SelectTrigger>
@@ -82,9 +168,16 @@ const AddNewTicker = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
-            <h3>Trade Enabled</h3>
-            <Select value={enabled} onValueChange={setEnabled}>
+
+          {/* Trade Enabled */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Trade Enabled</h3>
+            <Select
+              value={formData.trade_enabled.toString()}
+              onValueChange={(value) =>
+                updateFormData("trade_enabled", value === "true")
+              }
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -94,9 +187,14 @@ const AddNewTicker = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
-            <h3>Time Frame</h3>
-            <Select value={timeFrame} onValueChange={setTimeFrame}>
+
+          {/* Time Frame */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Time Frame</h3>
+            <Select
+              value={formData.timeframe}
+              onValueChange={(value) => updateFormData("timeframe", value)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a timeframe" />
               </SelectTrigger>
@@ -112,118 +210,114 @@ const AddNewTicker = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
-            <h3>Trend Line 1</h3>
-            <Select value={trendline1} onValueChange={setTrendline1}>
+
+          {/* Trend Line 1 */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Trend Line 1</h3>
+            <Select
+              value={formData.trend_line_1}
+              onValueChange={(value) => updateFormData("trend_line_1", value)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select trend line" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ema">EMA</SelectItem>
-                <SelectItem value="sma">SMA</SelectItem>
-                <SelectItem value="wilder-smoother">Wilder Smoother</SelectItem>
+                <SelectItem value="EMA">EMA</SelectItem>
+                <SelectItem value="SMA">SMA</SelectItem>
+                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
-            <h3>Period 1</h3>
-            <div className="flex items-center gap-2 relative">
-              <Button
-                type="button"
-                onClick={decrementPeriod1}
-                variant="outline"
-                className="w-6 h-6 absolute px-0 left-2"
-              >
-                -
-              </Button>
-              <Input
-                className="w-full text-center"
-                type="number"
-                min={1}
-                step={1}
-                value={period1}
-                onChange={handlePeriod1Change}
-              ></Input>
-              <Button
-                type="button"
-                onClick={incrementPeriod1}
-                variant="outline"
-                className="w-6 h-6 absolute px-0 right-2"
-              >
-                +
-              </Button>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <h3>Trend Line 2</h3>
-            <Select value={trendline2} onValueChange={setTrendline2}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select trend line" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ema">EMA</SelectItem>
-                <SelectItem value="sma">SMA</SelectItem>
-                <SelectItem value="wilder-smoother">Wilder Smoother</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <h3>Period 2</h3>
-            <div className="flex items-center gap-2 relative">
-              <Button
-                type="button"
-                onClick={decrementPeriod2}
-                variant="outline"
-                className="w-6 h-6 absolute px-0 left-2"
-              >
-                -
-              </Button>
-              <Input
-                className="w-full text-center"
-                type="number"
-                min={1}
-                step={1}
-                value={period2}
-                onChange={handlePeriod2Change}
-              ></Input>
-              <Button
-                type="button"
-                onClick={incrementPeriod2}
-                variant="outline"
-                className="w-6 h-6 absolute px-0 right-2"
-              >
-                +
-              </Button>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <h3>Schwab Quantity</h3>
+
+          {/* Period 1 */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Period 1</h3>
             <Input
               className="w-full"
               type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={schwabQty}
-              onChange={(e) => setSchwabQty(Number(e.target.value))}
+              min={1}
+              step={1}
+              inputMode="numeric"
+              value={formData.period_1}
+              onChange={(e) => handlePeriodChange("period_1", e.target.value)}
             />
           </div>
-          <div className="space-y-1">
-            <h3>TastyTrade Quantity</h3>
+
+          {/* Trend Line 2 */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Trend Line 2</h3>
+            <Select
+              value={formData.trend_line_2}
+              onValueChange={(value) => updateFormData("trend_line_2", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select trend line" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EMA">EMA</SelectItem>
+                <SelectItem value="SMA">SMA</SelectItem>
+                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Period 2 */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Period 2</h3>
             <Input
               className="w-full"
               type="number"
-              min={0}
+              min={1}
+              step={1}
+              inputMode="numeric"
+              value={formData.period_2}
+              onChange={(e) => handlePeriodChange("period_2", e.target.value)}
+            />
+          </div>
+
+          {/* Schwab Quantity */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Schwab Quantity</h3>
+            <Input
+              className="w-full"
+              type="number"
+              min={0.01}
               step="any"
               inputMode="decimal"
-              value={tastyQty}
-              onChange={(e) => setTastyQty(Number(e.target.value))}
+              value={formData.schwab_quantity}
+              onChange={(e) =>
+                updateFormData("schwab_quantity", Number(e.target.value) || 0)
+              }
+            />
+          </div>
+
+          {/* TastyTrade Quantity */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">TastyTrade Quantity</h3>
+            <Input
+              className="w-full"
+              type="number"
+              min={0.01}
+              step="any"
+              inputMode="decimal"
+              value={formData.tastytrade_quantity}
+              onChange={(e) => {
+                updateFormData("tastytrade_quantity", Number(e.target.value) || 0)
+              }}
             />
           </div>
         </CardContent>
-        <CardFooter>
-          <Button onClick={handleAddTicker} className="cursor-pointer">
-            Add Ticker
+        <CardFooter className="flex gap-2">
+          <Button
+            onClick={handleAddTicker}
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            {isLoading && <LoaderIcon className="w-4 h-4 animate-spin" />}
+            {isLoading ? "Adding..." : "Add Ticker"}
+          </Button>
+          <Button variant="outline" onClick={resetForm} disabled={isLoading}>
+            Reset
           </Button>
         </CardFooter>
       </Card>

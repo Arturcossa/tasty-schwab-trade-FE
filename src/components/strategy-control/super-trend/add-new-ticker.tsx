@@ -20,9 +20,9 @@ const AddNewTicker = () => {
   const [symbol, setSymbol] = useState("");
   const [enabled, setEnabled] = useState("false");
   const [timeFrame, setTimeFrame] = useState("");
-  const [trendline1, setTrendline1] = useState("ema");
+  const [trendline1, setTrendline1] = useState("EMA");
   const [period1, setPeriod1] = useState<number>(1);
-  const [trendline2, setTrendline2] = useState("ema");
+  const [trendline2, setTrendline2] = useState("EMA");
   const [period2, setPeriod2] = useState<number>(1);
   const [schwabQty, setSchwabQty] = useState<number>(0);
   const [tastyQty, setTastyQty] = useState<number>(0);
@@ -119,9 +119,9 @@ const AddNewTicker = () => {
                 <SelectValue placeholder="Select trend line" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ema">EMA</SelectItem>
-                <SelectItem value="sma">SMA</SelectItem>
-                <SelectItem value="wilder-smoother">Wilder Smoother</SelectItem>
+                <SelectItem value="EMA">EMA</SelectItem>
+                <SelectItem value="SMA">SMA</SelectItem>
+                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -161,9 +161,9 @@ const AddNewTicker = () => {
                 <SelectValue placeholder="Select trend line" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ema">EMA</SelectItem>
-                <SelectItem value="sma">SMA</SelectItem>
-                <SelectItem value="wilder-smoother">Wilder Smoother</SelectItem>
+                <SelectItem value="EMA">EMA</SelectItem>
+                <SelectItem value="SMA">SMA</SelectItem>
+                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
               </SelectContent>
             </Select>
           </div>
