@@ -3,6 +3,8 @@ import AddNewTicker from "./add-new-ticker"
 import TradingParameters from "./trading-parameters"
 
 const StrategyEma = () => {
+  
+
   return (
     <Card>
       <CardContent className="space-y-10">

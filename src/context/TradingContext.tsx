@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useAuth } from "./AuthContext";
 import { TickerData } from "@/lib/type";
+import { convertBackendDataToEmaArray } from "@/lib/functions";
 
 interface TradingContextType {
   schwabToken: string;
@@ -80,7 +81,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user?.token}`,
           },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify({ refresh_token_link: token }),
         }
       );
       const data = await response.json();
@@ -119,9 +120,38 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("TIM_TOKEN_VALIDATED", JSON.stringify(validated));
   };
 
+  // Fetch saved ticker data
   const getTickerData = async (strategy: "ema" | "supertrend") => {
-    // TODO: Implement API call to get ticker data
-    console.log("Getting ticker data for:", strategy);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get-ticker?strategy=${encodeURIComponent(strategy)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok && data.success && data.data) {
+        // Transform backend data to frontend format
+        const transformedData = convertBackendDataToEmaArray(data.data);
+        setTickerData({
+          ...tickerData,
+          [strategy]: transformedData,
+        });
+        
+        return { success: true, data: transformedData };
+      } else {
+        console.error("Failed to fetch ticker data:", data.message);
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error fetching ticker data:", error);
+      return { success: false, message: "Network error" };
+    }
   };
 
   const updateTickerData = (data: TickerData) => {

@@ -1,6 +1,6 @@
 import { EmaTicker } from "./type";
 
-function formatTimeFrame(raw: string): string {
+export function formatTimeFrame(raw: string): string {
   if (raw.endsWith('h')) return `${raw.slice(0, -1)}Hour`;
   if (raw.endsWith('d')) return `${raw.slice(0, -1)}Day`;
   if (raw.endsWith('t')) return `${raw.slice(0, -1)}t`;

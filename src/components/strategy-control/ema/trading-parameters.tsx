@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { Pencil, Trash2, Check, X } from "lucide-react";
 import { timeframes } from "@/lib/ema-datas";
+import { useTrading } from "@/context/TradingContext";
+import { EmaTicker } from "@/lib/type";
 
 const trendlineOptions = [
   { value: "EMA", label: "EMA" },
@@ -28,38 +30,25 @@ const trendlineOptions = [
   { value: "WilderSmoother", label: "Wilder Smoother" },
 ];
 
-type TradingRow = {
-  symbol: string;
-  enabled: string;
-  timeFrame: string;
-  trendline1: string;
-  period1: number;
-  trendline2: string;
-  period2: number;
-  schwabQty: number;
-  tastyQty: number;
-  [key: string]: string | number;
-};
-
 const TradingParameters = ({
-  data = [
-    {
-      symbol: "AAPL",
-      enabled: "true",
-      timeFrame: "1Day",
-      trendline1: "EMA",
-      period1: 9,
-      trendline2: "SMA",
-      period2: 21,
-      schwabQty: 10,
-      tastyQty: 5,
-    },
-  ] as TradingRow[],
   onEdit = (row: any) => {},
   onDelete = (row: any) => {},
 }) => {
+  const { tickerData, getTickerData, setTickerData } = useTrading();
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
-  const [editRow, setEditRow] = useState<any>(null);
+  const [editRow, setEditRow] = useState<EmaTicker | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      await getTickerData("ema");
+      setIsLoading(false);
+    };
+    
+    fetchData();
+  }, [getTickerData]);
 
   const handleEdit = (row: any, idx: number) => {
     setEditingIdx(idx);
@@ -71,16 +60,63 @@ const TradingParameters = ({
     setEditRow(null);
   };
 
-  const handleSave = () => {
-    const original = data[editingIdx!];
-    const isChanged = Object.keys(editRow).some(
-      (key) => editRow[key] !== original[key]
-    );
-    if (isChanged) {
-      onEdit(editRow);
+  const handleSave = async () => {
+    if (!editRow) return;
+    
+    setIsLoading(true);
+    try {
+      // Call your edit API here
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/update-ticker`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("TIM_TOKEN")}`,
+          },
+          body: JSON.stringify(editRow),
+        }
+      );
+
+      if (response.ok) {
+        // Refresh data after successful edit
+        await getTickerData("ema");
+        onEdit(editRow);
+      }
+    } catch (error) {
+      console.error("Error updating ticker:", error);
+    } finally {
+      setIsLoading(false);
+      setEditingIdx(null);
+      setEditRow(null);
     }
-    setEditingIdx(null);
-    setEditRow(null);
+  };
+
+  const handleDelete = async (row: EmaTicker) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete-ticker`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("TIM_TOKEN")}`,
+          },
+          body: JSON.stringify({ symbol: row.symbol }),
+        }
+      );
+
+      if (response.ok) {
+        // Refresh data after successful delete
+        await getTickerData("ema");
+        onDelete(row);
+      }
+    } catch (error) {
+      console.error("Error deleting ticker:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -104,7 +140,7 @@ const TradingParameters = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((row, idx) => (
+              {tickerData.ema.map((row, idx) => (
                 <TableRow
                   key={idx}
                   className="hover:bg-gray-100 transition-colors"
@@ -114,9 +150,9 @@ const TradingParameters = ({
                     <>
                       <TableCell>
                         <Select
-                          value={editRow.enabled}
+                          value={String(editRow?.trade_enabled)}
                           onValueChange={(val) =>
-                            setEditRow((r: any) => ({ ...r, enabled: val }))
+                            setEditRow((r: any) => ({ ...r, trade_enabled: val === "true" }))
                           }
                         >
                           <SelectTrigger className="w-24">
@@ -130,9 +166,9 @@ const TradingParameters = ({
                       </TableCell>
                       <TableCell>
                         <Select
-                          value={editRow.timeFrame}
+                          value={editRow?.timeframe}
                           onValueChange={(val) =>
-                            setEditRow((r: any) => ({ ...r, timeFrame: val }))
+                            setEditRow((r: any) => ({ ...r, timeframe: val }))
                           }
                         >
                           <SelectTrigger className="w-24">
@@ -149,9 +185,12 @@ const TradingParameters = ({
                       </TableCell>
                       <TableCell>
                         <Select
-                          value={editRow.trendline1}
+                          value={editRow?.trend_line_1}
                           onValueChange={(val) =>
-                            setEditRow((r: any) => ({ ...r, trendline1: val }))
+                            setEditRow((r: any) => ({
+                              ...r,
+                              trend_line_1: val,
+                            }))
                           }
                         >
                           <SelectTrigger className="w-24">
@@ -170,11 +209,11 @@ const TradingParameters = ({
                         <Input
                           type="number"
                           min={1}
-                          value={editRow.period1}
+                          value={editRow?.period_1}
                           onChange={(e) =>
                             setEditRow((r: any) => ({
                               ...r,
-                              period1: Number(e.target.value),
+                              period_1: Number(e.target.value),
                             }))
                           }
                           className="w-20"
@@ -182,9 +221,12 @@ const TradingParameters = ({
                       </TableCell>
                       <TableCell>
                         <Select
-                          value={editRow.trendline2}
+                          value={editRow?.trend_line_2}
                           onValueChange={(val) =>
-                            setEditRow((r: any) => ({ ...r, trendline2: val }))
+                            setEditRow((r: any) => ({
+                              ...r,
+                              trend_line_2: val,
+                            }))
                           }
                         >
                           <SelectTrigger className="w-24">
@@ -203,11 +245,11 @@ const TradingParameters = ({
                         <Input
                           type="number"
                           min={1}
-                          value={editRow.period2}
+                          value={editRow?.period_2}
                           onChange={(e) =>
                             setEditRow((r: any) => ({
                               ...r,
-                              period2: Number(e.target.value),
+                              period_2: Number(e.target.value),
                             }))
                           }
                           className="w-20"
@@ -218,11 +260,11 @@ const TradingParameters = ({
                           type="number"
                           min={0}
                           step="any"
-                          value={editRow.schwabQty}
+                          value={editRow?.schwab_quantity}
                           onChange={(e) =>
                             setEditRow((r: any) => ({
                               ...r,
-                              schwabQty: Number(e.target.value),
+                              schwab_quantity: Number(e.target.value),
                             }))
                           }
                           className="w-20"
@@ -233,11 +275,11 @@ const TradingParameters = ({
                           type="number"
                           min={0}
                           step="any"
-                          value={editRow.tastyQty}
+                          value={editRow?.tastytrade_quantity}
                           onChange={(e) =>
                             setEditRow((r: any) => ({
                               ...r,
-                              tastyQty: Number(e.target.value),
+                              tastytrade_quantity: Number(e.target.value),
                             }))
                           }
                           className="w-20"
@@ -267,25 +309,25 @@ const TradingParameters = ({
                       <TableCell>
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${
-                            row.enabled === "true"
+                            row.trade_enabled
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
                           }`}
                         >
-                          {row.enabled === "true" ? "Enabled" : "Disabled"}
+                          {row.trade_enabled ? "Enabled" : "Disabled"}
                         </span>
                       </TableCell>
-                      <TableCell>{row.timeFrame}</TableCell>
+                      <TableCell>{row.timeframe}</TableCell>
                       <TableCell className="uppercase">
-                        {row.trendline1}
+                        {row.trend_line_1}
                       </TableCell>
-                      <TableCell>{row.period1}</TableCell>
+                      <TableCell>{row.period_1}</TableCell>
                       <TableCell className="uppercase">
-                        {row.trendline2}
+                        {row.trend_line_2}
                       </TableCell>
-                      <TableCell>{row.period2}</TableCell>
-                      <TableCell>{row.schwabQty}</TableCell>
-                      <TableCell>{row.tastyQty}</TableCell>
+                      <TableCell>{row.period_2}</TableCell>
+                      <TableCell>{row.schwab_quantity}</TableCell>
+                      <TableCell>{row.tastytrade_quantity}</TableCell>
                       <TableCell className="text-right space-x-2">
                         <Button
                           size="icon"
@@ -298,7 +340,7 @@ const TradingParameters = ({
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => onDelete(row)}
+                          onClick={() => handleDelete(row)}
                           aria-label="Delete"
                         >
                           <Trash2 className="w-4 h-4 text-red-500" />
