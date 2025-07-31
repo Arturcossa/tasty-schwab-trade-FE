@@ -22,11 +22,11 @@ interface TradingContextType {
   setIsOpenTokenValidModal: (open: boolean) => void;
   isTokenValidated: boolean;
   setIsTokenValidated: (validated: boolean) => void;
-  getTickerData: (strategy: 'ema' | 'supertrend') => void;
+  getTickerData: (strategy: 'ema' | 'supertrend' | 'zeroday') => void;
   tickerData: TickerData;
   setTickerData: (data: TickerData) => void;
-  saveTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => Promise<any>;
-  deleteTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => void;
+  saveTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => Promise<any>;
+  deleteTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
@@ -47,6 +47,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   const [tickerData, setTickerData] = useState<TickerData>({
     ema: [],
     supertrend: [],
+    zeroday: []
   });
 
   useEffect(() => {
@@ -124,7 +125,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Fetch saved ticker data
-  const getTickerData = async (strategy: "ema" | "supertrend") => {
+  const getTickerData = async (strategy: "ema" | "supertrend" | "zeroday") => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get-ticker?strategy=${encodeURIComponent(strategy)}`,
@@ -158,7 +159,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Update ticker data
-  const saveTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => {
+  const saveTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add-ticker`,
@@ -199,7 +200,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   }
 
   // Delete ticker data
-  const deleteTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => {
+  const deleteTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete-ticker`,

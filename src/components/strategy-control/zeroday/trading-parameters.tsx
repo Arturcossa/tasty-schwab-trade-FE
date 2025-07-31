@@ -20,10 +20,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Pencil, Trash2, Check, X, Loader2Icon } from "lucide-react";
-import { timeframes } from "@/lib/ema-datas";
+import { timeframes } from "@/lib/zeroday-datas";
 import { useTrading } from "@/context/TradingContext";
-import { EmaTicker } from "@/lib/type";
-import { toast } from "sonner";
+import { ZerodayTicker } from "@/lib/type";
 
 const trendlineOptions = [
   { value: "EMA", label: "EMA" },
@@ -32,22 +31,17 @@ const trendlineOptions = [
 ];
 
 const TradingParameters = () => {
-  const {
-    tickerData,
-    getTickerData,
-    setTickerData,
-    saveTickerData,
-    deleteTickerData,
-  } = useTrading();
+  const { tickerData, getTickerData, saveTickerData, deleteTickerData } =
+    useTrading();
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
-  const [editRow, setEditRow] = useState<EmaTicker | null>(null);
+  const [editRow, setEditRow] = useState<ZerodayTicker | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch data when component mounts
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      await getTickerData("ema");
+      await getTickerData("zeroday");
       setIsLoading(false);
     };
 
@@ -100,8 +94,8 @@ const TradingParameters = () => {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : tickerData.ema && tickerData.ema.length > 0 ? (
-                  tickerData.ema.map((row, idx) => (
+                ) : tickerData.zeroday && tickerData.zeroday.length > 0 ? (
+                  tickerData.zeroday.map((row, idx) => (
                     <TableRow
                       key={idx}
                       className="hover:bg-gray-100 transition-colors"
@@ -277,7 +271,7 @@ const TradingParameters = () => {
                               onClick={async () => {
                                 if (editRow) {
                                   await saveTickerData({
-                                    strategy: "ema",
+                                    strategy: "zeroday",
                                     row: editRow,
                                   });
                                   setEditingIdx(null);
@@ -341,7 +335,7 @@ const TradingParameters = () => {
                                   )
                                 ) {
                                   deleteTickerData({
-                                    strategy: "ema",
+                                    strategy: "zeroday",
                                     row,
                                   });
                                 }

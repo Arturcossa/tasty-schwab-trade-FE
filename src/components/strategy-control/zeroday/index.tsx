@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import AddNewTicker from "./add-new-ticker"
 import TradingParameters from "./trading-parameters"
 
-const StrategySuperTrend = () => {
+const StrategyZeroDay = () => {
 
   return (
     <Card>
@@ -14,4 +14,4 @@ const StrategySuperTrend = () => {
   )
 }
 
-export default StrategySuperTrend
+export default StrategyZeroDay

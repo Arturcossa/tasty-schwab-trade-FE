@@ -7,10 +7,12 @@ import { useRouter } from "next/navigation";
 import StrategyEma from "@/components/strategy-control/ema";
 import StrategySuperTrend from "@/components/strategy-control/super-trend";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StrategyZeroDay from "@/components/strategy-control/zeroday";
 
 const StrategyControl = () => {
   const { user } = useAuth();
-  const { schwabToken, setIsOpenTokenValidModal, isTokenValidated } = useTrading();
+  const { setIsOpenTokenValidModal, isTokenValidated } =
+    useTrading();
   const router = useRouter();
 
   useEffect(() => {
@@ -23,7 +25,7 @@ const StrategyControl = () => {
   useEffect(() => {
     if (user && !isTokenValidated) {
       setIsOpenTokenValidModal(true);
-    } 
+    }
   }, [user, isTokenValidated, setIsOpenTokenValidModal]);
 
   if (!user) {
@@ -37,13 +39,16 @@ const StrategyControl = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="ema">📊 EMA Crossover</TabsTrigger>
             <TabsTrigger value="supertrend">📈 Supertrend</TabsTrigger>
-            <TabsTrigger value="0dspx">⚡ SPX 0DTE Options</TabsTrigger>
+            <TabsTrigger value="zeroday">⚡ SPX 0DTE Options</TabsTrigger>
           </TabsList>
           <TabsContent value="ema" className="w-full">
             <StrategyEma />
           </TabsContent>
           <TabsContent value="supertrend" className="w-full">
             <StrategySuperTrend />
+          </TabsContent>
+          <TabsContent value="zeroday" className="w-full">
+            <StrategyZeroDay />
           </TabsContent>
         </Tabs>
       </div>

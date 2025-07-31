@@ -12,11 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { symbols, timeframes } from "@/lib/ema-datas";
+import { symbols, timeframes } from "@/lib/zeroday-datas";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
-import { EmaTicker } from "@/lib/type";
+import { ZerodayTicker } from "@/lib/type";
 import { useTrading } from "@/context/TradingContext";
 
 const AddNewTicker = () => {
@@ -24,8 +24,8 @@ const AddNewTicker = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Form state
-  const [formData, setFormData] = useState<EmaTicker>({
-    symbol: "",
+  const [formData, setFormData] = useState<ZerodayTicker>({
+    symbol: "SPX",
     trade_enabled: false,
     timeframe: "",
     trend_line_1: "EMA",
@@ -37,7 +37,7 @@ const AddNewTicker = () => {
   });
 
   // Update form data helper
-  const updateFormData = (field: keyof EmaTicker, value: any) => {
+  const updateFormData = (field: keyof ZerodayTicker, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -70,7 +70,7 @@ const AddNewTicker = () => {
   // Reset form
   const resetForm = () => {
     setFormData({
-      symbol: "",
+      symbol: "SPX",
       trade_enabled: false,
       timeframe: "",
       trend_line_1: "EMA",
@@ -92,7 +92,7 @@ const AddNewTicker = () => {
       return;
     }
     setIsLoading(true);
-    await saveTickerData({ strategy: "ema", row: formData });
+    await saveTickerData({ strategy: "zeroday", row: formData });
     setIsLoading(false);
   };
 
