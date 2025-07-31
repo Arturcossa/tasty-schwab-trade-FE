@@ -456,8 +456,28 @@ const TradingParameters = () => {
                           <TableCell>{row.zigzag_percent_reversal}</TableCell>
                           <TableCell>{row.atr_length}</TableCell>
                           <TableCell>{row.zigzag_atr_multiple}</TableCell>
-                          <TableCell>{row.fibonacci_enabled}</TableCell>
-                          <TableCell>{row.support_demand_enabled}</TableCell>
+                          <TableCell>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                row.fibonacci_enabled
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {row.fibonacci_enabled ? "Enabled" : "Disabled"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                row.support_demand_enabled
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {row.support_demand_enabled ? "Enabled" : "Disabled"}
+                            </span>
+                          </TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"

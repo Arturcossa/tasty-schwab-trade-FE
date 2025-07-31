@@ -9,7 +9,10 @@ import {
 } from "react";
 import { useAuth } from "./AuthContext";
 import { TickerData } from "@/lib/type";
-import { convertBackendDataToEmaArray } from "@/lib/functions";
+import {
+  convertBackendDataToEmaArray,
+  covertBackendDataToSupertrendArray,
+} from "@/lib/functions";
 import { toast } from "sonner";
 import { EmaTicker } from "@/lib/ema-datas";
 import { SupertrendTicker } from "@/lib/supertrend-datas";
@@ -25,11 +28,23 @@ interface TradingContextType {
   setIsOpenTokenValidModal: (open: boolean) => void;
   isTokenValidated: boolean;
   setIsTokenValidated: (validated: boolean) => void;
-  getTickerData: (strategy: 'ema' | 'supertrend' | 'zeroday') => void;
+  getTickerData: (strategy: "ema" | "supertrend" | "zeroday") => void;
   tickerData: TickerData;
   setTickerData: (data: TickerData) => void;
-  saveTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker | ZerodayTicker}) => Promise<any>;
-  deleteTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker | ZerodayTicker}) => void;
+  saveTickerData: ({
+    strategy,
+    row,
+  }: {
+    strategy: "ema" | "supertrend" | "zeroday";
+    row: EmaTicker | SupertrendTicker | ZerodayTicker;
+  }) => Promise<any>;
+  deleteTickerData: ({
+    strategy,
+    row,
+  }: {
+    strategy: "ema" | "supertrend" | "zeroday";
+    row: EmaTicker | SupertrendTicker | ZerodayTicker;
+  }) => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
@@ -50,13 +65,13 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   const [tickerData, setTickerData] = useState<TickerData>({
     ema: [],
     supertrend: [],
-    zeroday: []
+    zeroday: [],
   });
 
   useEffect(() => {
     const storedSchwabToken = localStorage.getItem("TIM_REFRESH_TOKEN");
     const storedValidationStatus = localStorage.getItem("TIM_TOKEN_VALIDATED");
-    
+
     if (storedSchwabToken) {
       try {
         const parsedToken = JSON.parse(storedSchwabToken);
@@ -66,7 +81,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("TIM_REFRESH_TOKEN");
       }
     }
-    
+
     if (storedValidationStatus) {
       setIsTokenValidated(JSON.parse(storedValidationStatus));
     }
@@ -131,7 +146,9 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   const getTickerData = async (strategy: "ema" | "supertrend" | "zeroday") => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get-ticker?strategy=${encodeURIComponent(strategy)}`,
+        `${
+          process.env.NEXT_PUBLIC_BACKEND_URL
+        }/api/get-ticker?strategy=${encodeURIComponent(strategy)}`,
         {
           method: "GET",
           headers: {
@@ -144,12 +161,16 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
       if (response.ok && data.success && data.data) {
         // Transform backend data to frontend format
-        const transformedData = convertBackendDataToEmaArray(data.data);
+        let transformedData;
+        if (strategy !== "supertrend")
+          transformedData = convertBackendDataToEmaArray(data.data);
+        else transformedData = covertBackendDataToSupertrendArray(data.data);
+
         setTickerData({
           ...tickerData,
           [strategy]: transformedData,
         });
-        
+
         return { success: true, data: transformedData };
       } else {
         console.error("Failed to fetch ticker data:", data.message);
@@ -162,80 +183,95 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Update ticker data
-  const saveTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => {
+  const saveTickerData = async ({
+    strategy,
+    row,
+  }: {
+    strategy: "ema" | "supertrend" | "zeroday";
+    row: EmaTicker | SupertrendTicker;
+  }) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add-ticker`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${user?.token}`,
           },
           body: JSON.stringify({
             ...row,
             strategy: strategy,
-          })
+          }),
         }
-      )
-      const data = await response.json()
-      
+      );
+      const data = await response.json();
+
       if (data.success) {
-        const transformedData = convertBackendDataToEmaArray(data.data);
+        let transformedData;
+        if (strategy !== "supertrend")
+          transformedData = convertBackendDataToEmaArray(data.data);
+        else transformedData = covertBackendDataToSupertrendArray(data.data);
         setTickerData({
           ...tickerData,
-          [strategy]: transformedData
-        })
+          [strategy]: transformedData,
+        });
 
         toast.success("Save ticker successful!", {
-          className: "toast-success"
-        })
+          className: "toast-success",
+        });
       } else {
         toast.error(data.message || "Failed to save ticker", {
-          className: "toast-error"
-        })
+          className: "toast-error",
+        });
       }
     } catch (error) {
       toast.error(`Network error`, {
-        className: "toast-error"
-      })
+        className: "toast-error",
+      });
     }
-  }
+  };
 
   // Delete ticker data
-  const deleteTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => {
+  const deleteTickerData = async ({
+    strategy,
+    row,
+  }: {
+    strategy: "ema" | "supertrend" | "zeroday";
+    row: EmaTicker | SupertrendTicker;
+  }) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete-ticker`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${user?.token}`,
           },
           body: JSON.stringify({
             strategy: strategy,
-            symbol: row.symbol
-          })
+            symbol: row.symbol,
+          }),
         }
-      )
-      const data = await response.json()
+      );
+      const data = await response.json();
       if (data.success) {
         const transformedData = convertBackendDataToEmaArray(data.data);
         setTickerData({
           ...tickerData,
-          [strategy]: transformedData
-        })
+          [strategy]: transformedData,
+        });
         toast.success("Delete ticker successful!", {
-          className: "toast-success"
-        })
+          className: "toast-success",
+        });
       }
     } catch (error) {
       toast.error(`${error}`, {
-        className: "toast-error"
-      })
+        className: "toast-error",
+      });
     }
-  }
+  };
 
   const updateTickerData = (data: TickerData) => {
     setTickerData(data);
@@ -255,7 +291,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         tickerData,
         setTickerData: updateTickerData,
         saveTickerData,
-        deleteTickerData
+        deleteTickerData,
       }}
     >
       {children}

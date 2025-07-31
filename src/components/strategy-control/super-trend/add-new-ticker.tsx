@@ -114,7 +114,7 @@ const AddNewTicker = () => {
       return;
     }
     setIsLoading(true);
-    await saveTickerData({ strategy: "ema", row: formData });
+    await saveTickerData({ strategy: "supertrend", row: formData });
     setIsLoading(false);
   };
 
