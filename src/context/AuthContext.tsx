@@ -76,6 +76,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     localStorage.removeItem("TIM_USER");
     localStorage.removeItem("TIM_TOKEN");
+    localStorage.removeItem('TIM_REFRESH_TOKEN')
+    localStorage.removeItem("TIM_TOKEN_VALIDATED")
   };
 
   return (

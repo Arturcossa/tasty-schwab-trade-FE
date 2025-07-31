@@ -15,8 +15,10 @@ import {
 import { symbols, timeframes } from "@/lib/ema-datas";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTrading } from "@/context/TradingContext";
 
 const AddNewTicker = () => {
+  const { saveTickerData } = useTrading();
   const [symbol, setSymbol] = useState("");
   const [enabled, setEnabled] = useState("false");
   const [timeFrame, setTimeFrame] = useState("");
@@ -47,14 +49,36 @@ const AddNewTicker = () => {
   const decrementPeriod2 = () =>
     setPeriod2((prev) => (prev > 1 ? prev - 1 : 1));
 
-  const handleAddTicker = () => {
+  const handleAddTicker = async () => {
+    // Validate form
     if (!symbol) {
       return toast.warning("Select a symbol!");
     } else if (!timeFrame) {
       return toast.warning("Select a time frame!");
     }
 
-    
+    // Create form data object
+    const formData = {
+      symbol: symbol,
+      trade_enabled: enabled === "true",
+      timeframe: timeFrame,
+      trend_line_1: trendline1,
+      period_1: period1,
+      trend_line_2: trendline2,
+      period_2: period2,
+      schwab_quantity: schwabQty,
+      tastytrade_quantity: tastyQty,
+    };
+
+    // Use Promise toast for better UX
+    toast.promise(
+      saveTickerData({ strategy: 'supertrend', row: formData }),
+      {
+        loading: "Adding ticker...",
+        success: "Ticker added successfully!",
+        error: (err) => `Failed to add ticker: ${err.message || err}`
+      }
+    );
   };
 
   return (

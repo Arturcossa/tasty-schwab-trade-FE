@@ -31,20 +31,22 @@ const StrategyControl = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="ema">
-        <TabsList>
-          <TabsTrigger value="ema">📊 EMA Crossover</TabsTrigger>
-          <TabsTrigger value="supertrend">📈 Supertrend</TabsTrigger>
-          <TabsTrigger value="0dspx">⚡ SPX 0DTE Options</TabsTrigger>
-        </TabsList>
-        <TabsContent value="ema">
-          <StrategyEma />
-        </TabsContent>
-        <TabsContent value="supertrend">
-          <StrategySuperTrend />
-        </TabsContent>
-      </Tabs>
+    <div className="w-full max-w-full overflow-hidden">
+      <div className="space-y-6">
+        <Tabs defaultValue="ema" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="ema">📊 EMA Crossover</TabsTrigger>
+            <TabsTrigger value="supertrend">📈 Supertrend</TabsTrigger>
+            <TabsTrigger value="0dspx">⚡ SPX 0DTE Options</TabsTrigger>
+          </TabsList>
+          <TabsContent value="ema" className="w-full">
+            <StrategyEma />
+          </TabsContent>
+          <TabsContent value="supertrend" className="w-full">
+            <StrategySuperTrend />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

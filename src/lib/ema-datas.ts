@@ -12,6 +12,7 @@ export const symbols = [
 
 export const timeframes = [
   "1Min",
+  "2Min",
   "5Min",
   "15Min",
   "30Min",

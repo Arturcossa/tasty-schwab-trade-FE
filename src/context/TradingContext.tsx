@@ -8,8 +8,9 @@ import {
   useState,
 } from "react";
 import { useAuth } from "./AuthContext";
-import { TickerData } from "@/lib/type";
+import { EmaTicker, SupertrendTicker, TickerData } from "@/lib/type";
 import { convertBackendDataToEmaArray } from "@/lib/functions";
+import { toast } from "sonner";
 
 interface TradingContextType {
   schwabToken: string;
@@ -24,6 +25,8 @@ interface TradingContextType {
   getTickerData: (strategy: 'ema' | 'supertrend') => void;
   tickerData: TickerData;
   setTickerData: (data: TickerData) => void;
+  saveTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => Promise<any>;
+  deleteTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
@@ -154,6 +157,82 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Update ticker data
+  const saveTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add-ticker`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user?.token}`,
+          },
+          body: JSON.stringify({
+            ...row,
+            strategy: strategy,
+          })
+        }
+      )
+      const data = await response.json()
+      
+      if (data.success) {
+        const transformedData = convertBackendDataToEmaArray(data.data);
+        setTickerData({
+          ...tickerData,
+          [strategy]: transformedData
+        })
+
+        toast.success("Save ticker successful!", {
+          className: "toast-success"
+        })
+      } else {
+        toast.error(data.message || "Failed to save ticker", {
+          className: "toast-error"
+        })
+      }
+    } catch (error) {
+      toast.error(`Network error`, {
+        className: "toast-error"
+      })
+    }
+  }
+
+  // Delete ticker data
+  const deleteTickerData = async ({strategy, row}: {strategy: 'ema' | 'supertrend', row: EmaTicker | SupertrendTicker}) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete-ticker`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user?.token}`,
+          },
+          body: JSON.stringify({
+            strategy: strategy,
+            symbol: row.symbol
+          })
+        }
+      )
+      const data = await response.json()
+      if (data.success) {
+        const transformedData = convertBackendDataToEmaArray(data.data);
+        setTickerData({
+          ...tickerData,
+          [strategy]: transformedData
+        })
+        toast.success("Delete ticker successful!", {
+          className: "toast-success"
+        })
+      }
+    } catch (error) {
+      toast.error(`${error}`, {
+        className: "toast-error"
+      })
+    }
+  }
+
   const updateTickerData = (data: TickerData) => {
     setTickerData(data);
   };
@@ -171,6 +250,8 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         getTickerData,
         tickerData,
         setTickerData: updateTickerData,
+        saveTickerData,
+        deleteTickerData
       }}
     >
       {children}

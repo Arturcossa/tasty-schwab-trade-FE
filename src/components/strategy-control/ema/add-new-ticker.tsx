@@ -19,17 +19,10 @@ import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
 import { EmaTicker } from "@/lib/type";
 import { useTrading } from "@/context/TradingContext";
-import { convertBackendDataToEmaArray } from "@/lib/functions";
 
 const AddNewTicker = () => {
-  const { user } = useAuth();
-  const { tickerData, setTickerData } = useTrading();
+  const { saveTickerData } = useTrading();
   const [isLoading, setIsLoading] = useState(false);
-
-  // TODO
-  useEffect(() => {
-    console.log("ticker ", tickerData)
-  }, [tickerData])
 
   // Form state
   const [formData, setFormData] = useState<EmaTicker>({
@@ -40,8 +33,8 @@ const AddNewTicker = () => {
     period_1: 1,
     trend_line_2: "EMA",
     period_2: 1,
-    schwab_quantity: 1,
-    tastytrade_quantity: 1,
+    schwab_quantity: 0,
+    tastytrade_quantity: 0,
   });
 
   // Update form data helper
@@ -50,7 +43,10 @@ const AddNewTicker = () => {
   };
 
   // Period handlers with validation
-  const handlePeriodChange = (field: "period_1" | "period_2", value: string) => {
+  const handlePeriodChange = (
+    field: "period_1" | "period_2",
+    value: string
+  ) => {
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue > 0) {
       updateFormData(field, numValue);
@@ -65,8 +61,10 @@ const AddNewTicker = () => {
     if (!formData.timeframe) return "Please select a time frame";
     if (formData.period_1 < 1) return "Period 1 must be greater than 0";
     if (formData.period_2 < 1) return "Period 2 must be greater than 0";
-    if (formData.schwab_quantity <= 0) return "Schwab quantity must be greater than 0";
-    if (formData.tastytrade_quantity <= 0) return "TastyTrade quantity must be greater than 0";
+    if (formData.schwab_quantity < 0)
+      return "Schwab quantity must be greater than 0";
+    if (formData.tastytrade_quantity < 0)
+      return "TastyTrade quantity must be greater than 0";
     return null;
   };
 
@@ -80,8 +78,8 @@ const AddNewTicker = () => {
       period_1: 1,
       trend_line_2: "EMA",
       period_2: 1,
-      schwab_quantity: 1,
-      tastytrade_quantity: 1,
+      schwab_quantity: 0,
+      tastytrade_quantity: 0,
     });
   };
 
@@ -90,53 +88,13 @@ const AddNewTicker = () => {
     const validationError = validateForm();
     if (validationError) {
       toast.warning(validationError, {
-        className: "toast-warning"
+        className: "toast-warning",
       });
       return;
     }
-
     setIsLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add-ticker`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("TIM_TOKEN")}`,
-          },
-          body: JSON.stringify({
-            ...formData,
-            userId: user?.email,
-            strategy: "ema",
-          }),
-        }
-      );
-      const data = await response.json();
-      if (response.ok && data.success && data.data) {
-        toast.success("Ticker added successfully!", {
-          className: "toast-success",
-        });
-        const emaArray = convertBackendDataToEmaArray(data.data);
-        setTickerData({
-          ...tickerData,
-          ema: emaArray,
-        })
-        resetForm();
-      } else {
-        toast.error(data.message || "Failed to add ticker", {
-          className: "toast-error",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding ticker:", error);
-      toast.error("Network error. Please try again.", {
-        className: "toast-error",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await saveTickerData({ strategy: "ema", row: formData });
+    setIsLoading(false);
   };
 
   return (
@@ -281,7 +239,7 @@ const AddNewTicker = () => {
             <Input
               className="w-full"
               type="number"
-              min={0.01}
+              min={0}
               step="any"
               inputMode="decimal"
               value={formData.schwab_quantity}
@@ -297,12 +255,15 @@ const AddNewTicker = () => {
             <Input
               className="w-full"
               type="number"
-              min={0.01}
+              min={0}
               step="any"
               inputMode="decimal"
               value={formData.tastytrade_quantity}
               onChange={(e) => {
-                updateFormData("tastytrade_quantity", Number(e.target.value) || 0)
+                updateFormData(
+                  "tastytrade_quantity",
+                  Number(e.target.value) || 0
+                );
               }}
             />
           </div>

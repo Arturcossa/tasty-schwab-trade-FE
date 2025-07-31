@@ -146,3 +146,11 @@
   color: #0369a1 !important;
   border: 1px solid #7dd3fc !important;
 }
+
+/* Custom loading toast style */
+.toast-loading {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+}
+
