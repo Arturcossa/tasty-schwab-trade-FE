@@ -12,11 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { symbols, timeframes } from "@/lib/zeroday-datas";
+import { symbols, timeframes, ZerodayTicker } from "@/lib/zeroday-datas";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
-import { ZerodayTicker } from "@/lib/type";
 import { useTrading } from "@/context/TradingContext";
 
 const AddNewTicker = () => {
@@ -105,7 +104,7 @@ const AddNewTicker = () => {
         <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 pt-6">
           {/* Symbol Selection */}
           <div className="space-y-2">
-            <h3 className="font-medium text-sm">Ticker Symbol</h3>
+            <h3 className="font-medium text-sm">Symbol</h3>
             <Select
               value={formData.symbol}
               onValueChange={(value) => updateFormData("symbol", value)}

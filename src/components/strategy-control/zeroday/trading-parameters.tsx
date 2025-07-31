@@ -20,9 +20,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Pencil, Trash2, Check, X, Loader2Icon } from "lucide-react";
-import { timeframes } from "@/lib/zeroday-datas";
+import { timeframes, ZerodayTicker } from "@/lib/zeroday-datas";
 import { useTrading } from "@/context/TradingContext";
-import { ZerodayTicker } from "@/lib/type";
 
 const trendlineOptions = [
   { value: "EMA", label: "EMA" },
@@ -67,15 +66,15 @@ const TradingParameters = () => {
             <Table className="min-w-[850px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Ticker</TableHead>
+                  <TableHead>Symbol</TableHead>
                   <TableHead>Trade</TableHead>
-                  <TableHead>Time Frame</TableHead>
-                  <TableHead>Trendline 1</TableHead>
-                  <TableHead>Period 1</TableHead>
-                  <TableHead>Trendline 2</TableHead>
-                  <TableHead>Period 2</TableHead>
-                  <TableHead>Schwab Qty</TableHead>
-                  <TableHead>Tasty Qty</TableHead>
+                  <TableHead>TF</TableHead>
+                  <TableHead>TL1</TableHead>
+                  <TableHead>P1</TableHead>
+                  <TableHead>TL2</TableHead>
+                  <TableHead>P2</TableHead>
+                  <TableHead>SQty</TableHead>
+                  <TableHead>TQty</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>

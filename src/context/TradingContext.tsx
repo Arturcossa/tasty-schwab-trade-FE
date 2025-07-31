@@ -8,9 +8,12 @@ import {
   useState,
 } from "react";
 import { useAuth } from "./AuthContext";
-import { EmaTicker, SupertrendTicker, TickerData } from "@/lib/type";
+import { TickerData } from "@/lib/type";
 import { convertBackendDataToEmaArray } from "@/lib/functions";
 import { toast } from "sonner";
+import { EmaTicker } from "@/lib/ema-datas";
+import { SupertrendTicker } from "@/lib/supertrend-datas";
+import { ZerodayTicker } from "@/lib/zeroday-datas";
 
 interface TradingContextType {
   schwabToken: string;
@@ -25,8 +28,8 @@ interface TradingContextType {
   getTickerData: (strategy: 'ema' | 'supertrend' | 'zeroday') => void;
   tickerData: TickerData;
   setTickerData: (data: TickerData) => void;
-  saveTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => Promise<any>;
-  deleteTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker}) => void;
+  saveTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker | ZerodayTicker}) => Promise<any>;
+  deleteTickerData: ({strategy, row}: {strategy: 'ema' | 'supertrend' | 'zeroday', row: EmaTicker | SupertrendTicker | ZerodayTicker}) => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
