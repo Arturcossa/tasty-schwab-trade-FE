@@ -11,8 +11,6 @@ import StrategyZeroDay from "@/components/strategy-control/zeroday";
 
 const StrategyControl = () => {
   const { user } = useAuth();
-  const { setIsOpenTokenValidModal, isTokenValidated } =
-    useTrading();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,13 +18,6 @@ const StrategyControl = () => {
       router.push("/login");
     }
   }, [user, router]);
-
-  // Show modal on first load only if token is not validated
-  useEffect(() => {
-    if (user && !isTokenValidated) {
-      setIsOpenTokenValidModal(true);
-    }
-  }, [user, isTokenValidated, setIsOpenTokenValidModal]);
 
   if (!user) {
     return null;

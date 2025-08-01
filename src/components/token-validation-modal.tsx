@@ -12,9 +12,19 @@ import { toast } from "sonner";
 const TokenValidationModal = () => {
   const { schwabToken, setSchwabToken, validateSchwabToken, isOpenTokenValidModal, setIsOpenTokenValidModal, isTokenValidated } = useTrading();
   const [isValidating, setIsValidating] = useState(false);
-  const [tokenInput, setTokenInput] = useState(schwabToken || "");
+  const [tokenInput, setTokenInput] = useState("");
   const [validationError, setValidationError] = useState<string>("");
   const toastShownRef = useRef(false);
+  const isInitialized = useRef(false);
+
+  // Initialize token input only once when modal opens
+  useEffect(() => {
+    if (isOpenTokenValidModal && !isInitialized.current) {
+      setTokenInput(schwabToken || "");
+      setValidationError("");
+      isInitialized.current = true;
+    }
+  }, [isOpenTokenValidModal, schwabToken]);
 
   // Show info toast when modal opens for the first time
   useEffect(() => {
@@ -26,18 +36,11 @@ const TokenValidationModal = () => {
     }
   }, [isOpenTokenValidModal]);
 
-  // Reset token input and clear errors when modal opens
-  useEffect(() => {
-    if (isOpenTokenValidModal) {
-      setTokenInput(schwabToken || "");
-      setValidationError("");
-    }
-  }, [isOpenTokenValidModal, schwabToken]);
-
-  // Clear toast ref when modal closes
+  // Clear refs when modal closes
   useEffect(() => {
     if (!isOpenTokenValidModal) {
       toastShownRef.current = false;
+      isInitialized.current = false;
     }
   }, [isOpenTokenValidModal]);
 
@@ -66,10 +69,9 @@ const TokenValidationModal = () => {
   const handleClose = () => {
     // Only allow closing if token is validated or user explicitly cancels
     if (isTokenValidated) {
-      setTokenInput(schwabToken || "");
       setIsOpenTokenValidModal(false);
     } else {
-      setIsOpenTokenValidModal(false)
+      setIsOpenTokenValidModal(false);
       // Show warning that token validation is required
       toast.warning("Token validation is required to continue", {
         className: "toast-warning"

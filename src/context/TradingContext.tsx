@@ -6,12 +6,13 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { TickerData } from "@/lib/type";
 import {
   convertBackendDataToEmaArray,
-  covertBackendDataToSupertrendArray,
+  convertBackendDataToSupertrendArray,
 } from "@/lib/functions";
 import { toast } from "sonner";
 import { EmaTicker } from "@/lib/ema-datas";
@@ -67,8 +68,14 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     supertrend: [],
     zeroday: [],
   });
+  
+  // Add refs to prevent duplicate initialization
+  const isInitialized = useRef(false);
+  const modalShownRef = useRef(false);
 
   useEffect(() => {
+    if (isInitialized.current) return;
+    
     const storedSchwabToken = localStorage.getItem("TIM_REFRESH_TOKEN");
     const storedValidationStatus = localStorage.getItem("TIM_TOKEN_VALIDATED");
 
@@ -85,7 +92,25 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     if (storedValidationStatus) {
       setIsTokenValidated(JSON.parse(storedValidationStatus));
     }
+    
+    isInitialized.current = true;
   }, []);
+
+  // Handle modal state when user changes
+  useEffect(() => {
+    if (!user) {
+      // Reset modal state when user logs out
+      setIsOpenTokenValidModal(false);
+      modalShownRef.current = false;
+      return;
+    }
+
+    // Only show modal if user is logged in, token is not validated, and modal hasn't been shown yet
+    if (user && !isTokenValidated && !modalShownRef.current) {
+      setIsOpenTokenValidModal(true);
+      modalShownRef.current = true;
+    }
+  }, [user, isTokenValidated]);
 
   const validateSchwabToken = async (
     token: string
@@ -112,6 +137,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         setIsTokenValidated(true);
         localStorage.setItem("TIM_TOKEN_VALIDATED", "true");
         setIsOpenTokenValidModal(false);
+        modalShownRef.current = true; // Prevent modal from showing again
         return { success: true };
       } else {
         // If validation fails, keep modal open
@@ -140,6 +166,9 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   const updateTokenValidated = (validated: boolean) => {
     setIsTokenValidated(validated);
     localStorage.setItem("TIM_TOKEN_VALIDATED", JSON.stringify(validated));
+    if (validated) {
+      modalShownRef.current = true; // Prevent modal from showing again
+    }
   };
 
   // Fetch saved ticker data
@@ -164,7 +193,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         let transformedData;
         if (strategy !== "supertrend")
           transformedData = convertBackendDataToEmaArray(data.data);
-        else transformedData = covertBackendDataToSupertrendArray(data.data);
+        else transformedData = convertBackendDataToSupertrendArray(data.data);
 
         setTickerData({
           ...tickerData,
@@ -188,7 +217,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     row,
   }: {
     strategy: "ema" | "supertrend" | "zeroday";
-    row: EmaTicker | SupertrendTicker;
+    row: EmaTicker | SupertrendTicker | ZerodayTicker;
   }) => {
     try {
       const response = await fetch(
@@ -211,7 +240,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         let transformedData;
         if (strategy !== "supertrend")
           transformedData = convertBackendDataToEmaArray(data.data);
-        else transformedData = covertBackendDataToSupertrendArray(data.data);
+        else transformedData = convertBackendDataToSupertrendArray(data.data);
         setTickerData({
           ...tickerData,
           [strategy]: transformedData,
@@ -238,7 +267,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     row,
   }: {
     strategy: "ema" | "supertrend" | "zeroday";
-    row: EmaTicker | SupertrendTicker;
+    row: EmaTicker | SupertrendTicker | ZerodayTicker;
   }) => {
     try {
       const response = await fetch(
@@ -257,7 +286,10 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
       );
       const data = await response.json();
       if (data.success) {
-        const transformedData = convertBackendDataToEmaArray(data.data);
+        let transformedData;
+        if (strategy !== 'supertrend')
+          transformedData = convertBackendDataToEmaArray(data.data);
+        else transformedData = convertBackendDataToSupertrendArray(data.data)
         setTickerData({
           ...tickerData,
           [strategy]: transformedData,

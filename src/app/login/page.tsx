@@ -14,13 +14,15 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !isRedirecting) {
+      setIsRedirecting(true);
       router.push("/dashboard");
     }
-  }, [user, router]);
+  }, [user, router, isRedirecting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +33,7 @@ export default function LoginPage() {
       toast.success("Successful login!", {
         className: "toast-success"
       });
-      router.push("/dashboard");
+      // Let the useEffect handle the redirect
     } else {
       toast.error(`${res.message}`, {
         className: "toast-error"
@@ -39,8 +41,8 @@ export default function LoginPage() {
     }
   };
 
-  // Don't render if user is already logged in
-  if (user) {
+  // Don't render if user is already logged in or redirecting
+  if (user || isRedirecting) {
     return null;
   }
 
