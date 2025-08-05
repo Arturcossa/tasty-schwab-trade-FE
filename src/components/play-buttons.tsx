@@ -17,18 +17,15 @@ export default function PlayButtons() {
   }
 
   return (
-    <div className="flex-1 flex gap-2 justify-end">
+    <div className="flex-1 flex gap-5 justify-center p-3">
       <Button onClick={onPlay} variant="default" aria-label="Play" className="cursor-pointer">
         <Play className="w-4 h-4" />
-        Play
       </Button>
       <Button onClick={onRestart} variant="secondary" aria-label="Restart" className="cursor-pointer">
         <RotateCcw className="w-4 h-4" />
-        Restart
       </Button>
       <Button onClick={onStop} variant="destructive" aria-label="Stop" className="cursor-pointer">
         <Square className="w-4 h-4" />
-        Stop
       </Button>
     </div>
   );

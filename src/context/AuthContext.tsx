@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, {
   createContext,
   useContext,
@@ -7,9 +8,14 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: { email: string; token: string } | null;
+  connectionStatus: {
+    schwab: boolean,
+    tasty: boolean,
+  }
   login: (
     email: string,
     password: string
@@ -35,6 +41,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ email: string; token: string } | null>(
     null
   );
+  const [connectionStatus, setConnectionStatus] = useState<{
+    schwab: boolean;
+    tasty: boolean;
+  }>({
+    schwab: false,
+    tasty: false,
+  });
+  const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("TIM_USER");
@@ -58,30 +72,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (res.ok && data.success) {
         setUser({ email: email, token: data.token });
-        localStorage.setItem("TIM_USER", JSON.stringify({ email }));
-        localStorage.setItem("TIM_TOKEN", data.token);
-        localStorage.setItem("TIM_REFRESH_TOKEN", data.refreshToken)
+        setConnectionStatus({
+          schwab: data.refreshToken ? true : false,
+          tasty: data.tastyToken ? true : false,
+        });
+        toast.success("Successful login!", {
+          className: "toast-success",
+        });
+        router.push("/dashboard");
         return { success: true, token: data.token };
       }
+
+      toast.error(`${data.message}`, {
+        className: "toast-error",
+      });
       return {
         success: false,
         message: data.message,
       };
     } catch (err) {
+      toast.error(`Network error`, {
+        className: "toast-error",
+      });
       return { success: false, message: "Network error" };
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("TIM_USER");
-    localStorage.removeItem("TIM_TOKEN");
-    localStorage.removeItem('TIM_REFRESH_TOKEN')
-    localStorage.removeItem("TIM_TOKEN_VALIDATED")
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, connectionStatus, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

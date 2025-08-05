@@ -19,8 +19,6 @@ import { SupertrendTicker } from "@/lib/supertrend-datas";
 import { ZerodayTicker } from "@/lib/zeroday-datas";
 
 interface TradingContextType {
-  schwabToken: string;
-  setSchwabToken: (token: string) => void;
   validateSchwabToken: (
     token: string
   ) => Promise<{ success: boolean; message?: string }>;
@@ -59,7 +57,6 @@ export const useTrading = () => {
 
 export const TradingProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
-  const [schwabToken, setSchwabToken] = useState<string>("");
   const [isOpenTokenValidModal, setIsOpenTokenValidModal] = useState(false);
   const [isTokenValidated, setIsTokenValidated] = useState(false);
   const [tickerData, setTickerData] = useState<TickerData>({
@@ -67,25 +64,6 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     supertrend: [],
     zeroday: [],
   });
-
-  useEffect(() => {
-    const storedSchwabToken = localStorage.getItem("TIM_REFRESH_TOKEN");
-    const storedValidationStatus = localStorage.getItem("TIM_TOKEN_VALIDATED");
-
-    if (storedSchwabToken) {
-      try {
-        const parsedToken = JSON.parse(storedSchwabToken);
-        setSchwabToken(parsedToken);
-      } catch (error) {
-        console.error("Error parsing stored token:", error);
-        localStorage.removeItem("TIM_REFRESH_TOKEN");
-      }
-    }
-
-    if (storedValidationStatus) {
-      setIsTokenValidated(JSON.parse(storedValidationStatus));
-    }
-  }, []);
 
   const validateSchwabToken = async (
     token: string
@@ -109,37 +87,33 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
       if (response.ok && data.success) {
         // If validation succeeds, mark as validated and close modal
-        setIsTokenValidated(true);
-        localStorage.setItem("TIM_TOKEN_VALIDATED", "true");
         setIsOpenTokenValidModal(false);
+        setIsTokenValidated(true);
+        toast.success("Token validated and saved successfully!", {
+          className: "toast-success",
+        });
         return { success: true };
       } else {
         // If validation fails, keep modal open
         setIsTokenValidated(false);
-        localStorage.setItem("TIM_TOKEN_VALIDATED", "false");
+        toast.error(data.message || "Token validation failed", {
+          className: "toast-error",
+        });
         return {
           success: false,
           message: data.message || "Token validation failed",
         };
       }
     } catch (error) {
-      setIsTokenValidated(false);
-      localStorage.setItem("TIM_TOKEN_VALIDATED", "false");
+      setIsTokenValidated(false)
+      toast.error("Network error during token validation", {
+        className: "toast-error",
+      });
       return {
         success: false,
         message: "Network error during token validation",
       };
     }
-  };
-
-  const updateSchwabToken = (token: string) => {
-    setSchwabToken(token);
-    localStorage.setItem("TIM_REFRESH_TOKEN", JSON.stringify(token));
-  };
-
-  const updateTokenValidated = (validated: boolean) => {
-    setIsTokenValidated(validated);
-    localStorage.setItem("TIM_TOKEN_VALIDATED", JSON.stringify(validated));
   };
 
   // Fetch saved ticker data
@@ -280,13 +254,11 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   return (
     <TradingContext.Provider
       value={{
-        schwabToken,
-        setSchwabToken: updateSchwabToken,
         validateSchwabToken,
         isOpenTokenValidModal,
         setIsOpenTokenValidModal,
         isTokenValidated,
-        setIsTokenValidated: updateTokenValidated,
+        setIsTokenValidated,
         getTickerData,
         tickerData,
         setTickerData: updateTickerData,
