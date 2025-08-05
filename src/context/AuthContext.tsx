@@ -16,6 +16,10 @@ interface AuthContextType {
     schwab: boolean,
     tasty: boolean,
   }
+  setConnectionStatus: (api: {
+    schwab: boolean,
+    tasty: boolean,
+  } | ((prev: { schwab: boolean; tasty: boolean }) => { schwab: boolean; tasty: boolean })) => void;
   login: (
     email: string,
     password: string
@@ -48,6 +52,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     schwab: false,
     tasty: false,
   });
+
+  const updateConnectionStatus = (
+    value: { schwab: boolean; tasty: boolean } | ((prev: { schwab: boolean; tasty: boolean }) => { schwab: boolean; tasty: boolean })
+  ) => {
+    if (typeof value === 'function') {
+      setConnectionStatus(value);
+    } else {
+      setConnectionStatus(value);
+    }
+  };
   const router = useRouter();
 
   useEffect(() => {
@@ -103,7 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, connectionStatus, login, logout }}>
+    <AuthContext.Provider value={{ user, connectionStatus, setConnectionStatus: updateConnectionStatus, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

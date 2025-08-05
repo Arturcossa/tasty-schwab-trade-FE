@@ -26,6 +26,7 @@ interface TradingContextType {
   setIsOpenTokenValidModal: (open: boolean) => void;
   isTokenValidated: boolean;
   setIsTokenValidated: (validated: boolean) => void;
+  getConnectionTasty: () => void;
   getTickerData: (strategy: "ema" | "supertrend" | "zeroday") => void;
   tickerData: TickerData;
   setTickerData: (data: TickerData) => void;
@@ -56,7 +57,7 @@ export const useTrading = () => {
 };
 
 export const TradingProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, connectionStatus, setConnectionStatus } = useAuth();
   const [isOpenTokenValidModal, setIsOpenTokenValidModal] = useState(false);
   const [isTokenValidated, setIsTokenValidated] = useState(false);
   const [tickerData, setTickerData] = useState<TickerData>({
@@ -113,6 +114,51 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         success: false,
         message: "Network error during token validation",
       };
+    }
+  };
+
+  const getConnectionTasty = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get-tasty-connection`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      )
+
+      const data = await response.json()
+      if (response.ok && data.success) {
+        setConnectionStatus({
+          ...connectionStatus,
+          tasty: true,
+        });
+        toast.success("Connection to Tastytrade successful!", {
+          className: "toast-success",
+        });
+        return { success: true };
+      } else {
+        setConnectionStatus({
+          ...connectionStatus,
+          tasty: false,
+        }); 
+        toast.error(data.message || "Connection to Tastytrade failed", {
+          className: "toast-error",
+        });
+        return { success: false, message: data.message || "Connection to Tastytrade failed" };
+      }
+    } catch (error) {
+      setConnectionStatus({
+        ...connectionStatus,
+        tasty: false,
+      });
+      toast.error("Network error during connection to Tastytrade", {
+        className: "toast-error",
+      });
+      return { success: false, message: "Network error during connection to Tastytrade" };
     }
   };
 
@@ -259,6 +305,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         setIsOpenTokenValidModal,
         isTokenValidated,
         setIsTokenValidated,
+        getConnectionTasty,
         getTickerData,
         tickerData,
         setTickerData: updateTickerData,

@@ -32,11 +32,11 @@ import PlayButtons from "./play-buttons";
 const AppSidebar = () => {
   const pathname = usePathname();
   const { logout, connectionStatus } = useAuth();
-  const { setIsOpenTokenValidModal } = useTrading();
+  const { setIsOpenTokenValidModal, getConnectionTasty } = useTrading();
 
-  // TODO
   const handleGetSchwabToken = (api: 'schwab' | 'tasty') => {
     if (api === 'schwab') setIsOpenTokenValidModal(true)
+    else getConnectionTasty()
   }
 
   return (
