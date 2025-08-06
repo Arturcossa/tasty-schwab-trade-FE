@@ -12,32 +12,30 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from "./ui/sidebar";
 import { Button } from "./ui/button";
 import {
   LayoutDashboard,
-  KeyRound,
   LogOut,
   User,
   Wifi,
   WifiOff,
-  CirclePlay,
+  // CirclePlay,
 } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { useTrading } from "@/context/TradingContext";
+// import { useTrading } from "@/context/TradingContext";
 import PlayButtons from "./play-buttons";
 
 const AppSidebar = () => {
   const pathname = usePathname();
   const { logout, connectionStatus } = useAuth();
-  const { setIsOpenTokenValidModal, getConnectionTasty } = useTrading();
+  // const { setIsOpenTokenValidModal, getConnectionTasty } = useTrading();
 
-  const handleGetSchwabToken = (api: 'schwab' | 'tasty') => {
-    if (api === 'schwab') setIsOpenTokenValidModal(true)
-    else getConnectionTasty()
-  }
+  // const handleGetSchwabToken = (api: 'schwab' | 'tasty') => {
+  //   if (api === 'schwab') setIsOpenTokenValidModal(true)
+  //   else getConnectionTasty()
+  // }
 
   return (
     <Sidebar className="font-playfair">
@@ -98,11 +96,11 @@ const AppSidebar = () => {
                     <Wifi className="h-5 w-5 text-green-600" />
                   ) : (
                     <>
-                      <CirclePlay
+                      {/* <CirclePlay
                         className="h-5 w-5 text-gray-500 cursor-pointer hover:scale-105"
                         type="button"
                         onClick={() => handleGetSchwabToken('tasty')}
-                      />
+                      /> */}
                       <WifiOff className="h-5 w-5 text-red-500" />
                     </>
                   )}
@@ -116,11 +114,11 @@ const AppSidebar = () => {
                     <Wifi className="h-5 w-5 text-green-600" />
                   ) : (
                     <>
-                      <CirclePlay
+                      {/* <CirclePlay
                         className="h-5 w-5 text-gray-500 cursor-pointer hover:scale-105"
                         type="button"
                         onClick={() => handleGetSchwabToken('schwab')}
-                      />
+                      /> */}
                       <WifiOff className="h-5 w-5 text-red-500" />
                     </>
                   )}
