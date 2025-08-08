@@ -44,6 +44,8 @@ interface TradingContextType {
     strategy: "ema" | "supertrend" | "zeroday";
     row: EmaTicker | SupertrendTicker | ZerodayTicker;
   }) => void;
+  currentStrategy: "ema" | "supertrend" | "zeroday";
+  setCurrentStrategy: (s: "ema" | "supertrend" | "zeroday") => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
@@ -65,6 +67,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     supertrend: [],
     zeroday: [],
   });
+  const [currentStrategy, setCurrentStrategy] = useState<"ema" | "supertrend" | "zeroday">("ema")
 
   const validateSchwabToken = async (
     token: string
@@ -311,6 +314,8 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         setTickerData: updateTickerData,
         saveTickerData,
         deleteTickerData,
+        currentStrategy, 
+        setCurrentStrategy
       }}
     >
       {children}

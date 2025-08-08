@@ -7,10 +7,12 @@ import StrategyEma from "@/components/strategy-control/ema";
 import StrategySuperTrend from "@/components/strategy-control/super-trend";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StrategyZeroDay from "@/components/strategy-control/zeroday";
+import { useTrading } from "@/context/TradingContext";
 
 const StrategyControl = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const { currentStrategy, setCurrentStrategy } = useTrading()
 
   useEffect(() => {
     if (!user) {
@@ -25,7 +27,7 @@ const StrategyControl = () => {
   return (
     <div className="w-full max-w-full overflow-hidden">
       <div className="space-y-6">
-        <Tabs defaultValue="ema" className="w-full">
+        <Tabs defaultValue="ema" className="w-full" value={currentStrategy} onValueChange={() => setCurrentStrategy}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="ema">📊 EMA Crossover</TabsTrigger>
             <TabsTrigger value="supertrend">📈 Supertrend</TabsTrigger>

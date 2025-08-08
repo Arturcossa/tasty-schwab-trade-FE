@@ -2,10 +2,33 @@
 
 import { Play, RotateCcw, Square } from "lucide-react";
 import { Button } from "./ui/button";
+import { useTrading } from "@/context/TradingContext";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 export default function PlayButtons() {
-  const onPlay = () => {
+  const {currentStrategy} = useTrading();
+  const { user } = useAuth()
 
+  const onPlay = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/start-trading?strategy=${currentStrategy}`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+      }
+    )
+    const data = await res.json()
+    if (res.ok && data.success) {
+      toast.success(data.message, {
+        className: "toast-success"
+      })
+    } else {
+      toast.success(data.message, )
+    }
+    console.log("res", res)
   }
 
   const onRestart = () => {
