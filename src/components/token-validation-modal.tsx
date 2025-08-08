@@ -1,71 +1,31 @@
-'use client'
+"use client";
 
 import { useTrading } from "@/context/TradingContext";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { LoaderIcon, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const TokenValidationModal = () => {
-  const { schwabToken, setSchwabToken, validateSchwabToken, isOpenTokenValidModal, setIsOpenTokenValidModal, isTokenValidated } = useTrading();
+  const {
+    validateSchwabToken,
+    isOpenTokenValidModal,
+    setIsOpenTokenValidModal,
+    isTokenValidated
+  } = useTrading();
   const [isValidating, setIsValidating] = useState(false);
   const [tokenInput, setTokenInput] = useState("");
   const [validationError, setValidationError] = useState<string>("");
-  const toastShownRef = useRef(false);
-  const isInitialized = useRef(false);
-
-  // Initialize token input only once when modal opens
-  useEffect(() => {
-    if (isOpenTokenValidModal && !isInitialized.current) {
-      setTokenInput(schwabToken || "");
-      setValidationError("");
-      isInitialized.current = true;
-    }
-  }, [isOpenTokenValidModal, schwabToken]);
-
-  // Show info toast when modal opens for the first time
-  useEffect(() => {
-    if (isOpenTokenValidModal && !toastShownRef.current) {
-      toast.info("Please update Schwab refresh token!", {
-        className: "toast-info"
-      });
-      toastShownRef.current = true;
-    }
-  }, [isOpenTokenValidModal]);
-
-  // Clear refs when modal closes
-  useEffect(() => {
-    if (!isOpenTokenValidModal) {
-      toastShownRef.current = false;
-      isInitialized.current = false;
-    }
-  }, [isOpenTokenValidModal]);
 
   const handleTokenSubmit = async (e: React.FormEvent) => {
-    console.log("fjefjeiof")
     e.preventDefault();
     setIsValidating(true);
     setValidationError("");
-    const result = await validateSchwabToken(tokenInput);
-    console.log('fjjijfe', result)
+    await validateSchwabToken(tokenInput);
     setIsValidating(false);
-
-    if (result.success) {
-      setSchwabToken(tokenInput);
-      localStorage.setItem("TIM_REFRESH_TOKEN", JSON.stringify(tokenInput));
-      toast.success("Token validated and saved successfully!", {
-        className: "toast-success"
-      });
-      setIsOpenTokenValidModal(false);
-    } else {
-      setValidationError(result.message || "Token validation failed");
-      toast.error(result.message || "Token validation failed", {
-        className: "toast-error"
-      });
-    }
   };
 
   const handleClose = () => {
@@ -74,9 +34,8 @@ const TokenValidationModal = () => {
       setIsOpenTokenValidModal(false);
     } else {
       setIsOpenTokenValidModal(false);
-      // Show warning that token validation is required
       toast.warning("Token validation is required to continue", {
-        className: "toast-warning"
+        className: "toast-warning",
       });
     }
   };
@@ -99,7 +58,7 @@ const TokenValidationModal = () => {
               required
             />
           </div>
-          
+
           {/* Show validation error if exists */}
           {validationError && (
             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-800">
@@ -107,18 +66,20 @@ const TokenValidationModal = () => {
               <span className="text-sm">{validationError}</span>
             </div>
           )}
-          
+
           <div className="flex gap-2 justify-end">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={handleClose}
               disabled={isValidating}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={isValidating}>
-              {isValidating && <LoaderIcon className="w-4 h-4 animate-spin mr-2" />}
+              {isValidating && (
+                <LoaderIcon className="w-4 h-4 animate-spin mr-2" />
+              )}
               {isValidating ? "Validating..." : "Validate & Save"}
             </Button>
           </div>

@@ -4,9 +4,7 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
   useState,
-  useRef,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { TickerData } from "@/lib/type";
@@ -20,8 +18,6 @@ import { SupertrendTicker } from "@/lib/supertrend-datas";
 import { ZerodayTicker } from "@/lib/zeroday-datas";
 
 interface TradingContextType {
-  schwabToken: string;
-  setSchwabToken: (token: string) => void;
   validateSchwabToken: (
     token: string
   ) => Promise<{ success: boolean; message?: string }>;
@@ -29,6 +25,7 @@ interface TradingContextType {
   setIsOpenTokenValidModal: (open: boolean) => void;
   isTokenValidated: boolean;
   setIsTokenValidated: (validated: boolean) => void;
+  getConnectionTasty: () => void;
   getTickerData: (strategy: "ema" | "supertrend" | "zeroday") => void;
   tickerData: TickerData;
   setTickerData: (data: TickerData) => void;
@@ -46,6 +43,8 @@ interface TradingContextType {
     strategy: "ema" | "supertrend" | "zeroday";
     row: EmaTicker | SupertrendTicker | ZerodayTicker;
   }) => void;
+  currentStrategy: "ema" | "supertrend" | "zeroday";
+  setCurrentStrategy: (s: "ema" | "supertrend" | "zeroday") => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
@@ -59,8 +58,7 @@ export const useTrading = () => {
 };
 
 export const TradingProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
-  const [schwabToken, setSchwabToken] = useState<string>("");
+  const { user, connectionStatus, setConnectionStatus } = useAuth();
   const [isOpenTokenValidModal, setIsOpenTokenValidModal] = useState(false);
   const [isTokenValidated, setIsTokenValidated] = useState(false);
   const [tickerData, setTickerData] = useState<TickerData>({
@@ -68,49 +66,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     supertrend: [],
     zeroday: [],
   });
-  
-  // Add refs to prevent duplicate initialization
-  const isInitialized = useRef(false);
-  const modalShownRef = useRef(false);
-
-  useEffect(() => {
-    if (isInitialized.current) return;
-    
-    const storedSchwabToken = localStorage.getItem("TIM_REFRESH_TOKEN");
-    const storedValidationStatus = localStorage.getItem("TIM_TOKEN_VALIDATED");
-
-    if (storedSchwabToken) {
-      try {
-        const parsedToken = JSON.parse(storedSchwabToken);
-        setSchwabToken(parsedToken);
-      } catch (error) {
-        console.error("Error parsing stored token:", error);
-        localStorage.removeItem("TIM_REFRESH_TOKEN");
-      }
-    }
-
-    if (storedValidationStatus) {
-      setIsTokenValidated(JSON.parse(storedValidationStatus));
-    }
-    
-    isInitialized.current = true;
-  }, []);
-
-  // Handle modal state when user changes
-  useEffect(() => {
-    if (!user) {
-      // Reset modal state when user logs out
-      setIsOpenTokenValidModal(false);
-      modalShownRef.current = false;
-      return;
-    }
-
-    // Only show modal if user is logged in, token is not validated, and modal hasn't been shown yet
-    if (user && !isTokenValidated && !modalShownRef.current) {
-      setIsOpenTokenValidModal(true);
-      modalShownRef.current = true;
-    }
-  }, [user, isTokenValidated]);
+  const [currentStrategy, setCurrentStrategy] = useState<"ema" | "supertrend" | "zeroday">("ema")
 
   const validateSchwabToken = async (
     token: string
@@ -134,23 +90,28 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
       if (response.ok && data.success) {
         // If validation succeeds, mark as validated and close modal
-        setIsTokenValidated(true);
-        localStorage.setItem("TIM_TOKEN_VALIDATED", "true");
         setIsOpenTokenValidModal(false);
-        modalShownRef.current = true; // Prevent modal from showing again
+        setIsTokenValidated(true);
+        toast.success("Token validated and saved successfully!", {
+          className: "toast-success",
+        });
         return { success: true };
       } else {
         // If validation fails, keep modal open
         setIsTokenValidated(false);
-        localStorage.setItem("TIM_TOKEN_VALIDATED", "false");
+        toast.error(data.message || "Token validation failed", {
+          className: "toast-error",
+        });
         return {
           success: false,
           message: data.message || "Token validation failed",
         };
       }
     } catch (error) {
-      setIsTokenValidated(false);
-      localStorage.setItem("TIM_TOKEN_VALIDATED", "false");
+      setIsTokenValidated(false)
+      toast.error("Network error during token validation", {
+        className: "toast-error",
+      });
       return {
         success: false,
         message: "Network error during token validation",
@@ -158,16 +119,48 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateSchwabToken = (token: string) => {
-    setSchwabToken(token);
-    localStorage.setItem("TIM_REFRESH_TOKEN", JSON.stringify(token));
-  };
+  const getConnectionTasty = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get-tasty-connection`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      )
 
-  const updateTokenValidated = (validated: boolean) => {
-    setIsTokenValidated(validated);
-    localStorage.setItem("TIM_TOKEN_VALIDATED", JSON.stringify(validated));
-    if (validated) {
-      modalShownRef.current = true; // Prevent modal from showing again
+      const data = await response.json()
+      if (response.ok && data.success) {
+        setConnectionStatus({
+          ...connectionStatus,
+          tasty: true,
+        });
+        toast.success("Connection to Tastytrade successful!", {
+          className: "toast-success",
+        });
+        return { success: true };
+      } else {
+        setConnectionStatus({
+          ...connectionStatus,
+          tasty: false,
+        }); 
+        toast.error(data.message || "Connection to Tastytrade failed", {
+          className: "toast-error",
+        });
+        return { success: false, message: data.message || "Connection to Tastytrade failed" };
+      }
+    } catch (error) {
+      setConnectionStatus({
+        ...connectionStatus,
+        tasty: false,
+      });
+      toast.error("Network error during connection to Tastytrade", {
+        className: "toast-error",
+      });
+      return { success: false, message: "Network error during connection to Tastytrade" };
     }
   };
 
@@ -312,18 +305,19 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
   return (
     <TradingContext.Provider
       value={{
-        schwabToken,
-        setSchwabToken: updateSchwabToken,
         validateSchwabToken,
         isOpenTokenValidModal,
         setIsOpenTokenValidModal,
         isTokenValidated,
-        setIsTokenValidated: updateTokenValidated,
+        setIsTokenValidated,
+        getConnectionTasty,
         getTickerData,
         tickerData,
         setTickerData: updateTickerData,
         saveTickerData,
         deleteTickerData,
+        currentStrategy, 
+        setCurrentStrategy
       }}
     >
       {children}

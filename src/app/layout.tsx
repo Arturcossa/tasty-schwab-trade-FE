@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import AppSidebar from "@/components/app-sidebar";
-import AppBreadCrumb from "@/components/app-breadcrumb";
 import { Toaster } from "@/components/ui/sonner";
-import PlayButtons from "@/components/play-buttons";
 import { AuthProvider } from "@/context/AuthContext";
 import { TradingProvider } from "@/context/TradingContext";
 
