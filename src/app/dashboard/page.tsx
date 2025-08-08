@@ -1,14 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Page = () => {
   const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    router.push("/dashboard/strategy-control");
-  }, [router]);
+    if (!isRedirecting) {
+      setIsRedirecting(true);
+      router.push("/dashboard/strategy-control");
+    }
+  }, [router, isRedirecting]);
 
   return null;
 };

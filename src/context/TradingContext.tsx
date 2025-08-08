@@ -4,14 +4,13 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { TickerData } from "@/lib/type";
 import {
   convertBackendDataToEmaArray,
-  covertBackendDataToSupertrendArray,
+  convertBackendDataToSupertrendArray,
 } from "@/lib/functions";
 import { toast } from "sonner";
 import { EmaTicker } from "@/lib/ema-datas";
@@ -187,7 +186,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         let transformedData;
         if (strategy !== "supertrend")
           transformedData = convertBackendDataToEmaArray(data.data);
-        else transformedData = covertBackendDataToSupertrendArray(data.data);
+        else transformedData = convertBackendDataToSupertrendArray(data.data);
 
         setTickerData({
           ...tickerData,
@@ -211,7 +210,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     row,
   }: {
     strategy: "ema" | "supertrend" | "zeroday";
-    row: EmaTicker | SupertrendTicker;
+    row: EmaTicker | SupertrendTicker | ZerodayTicker;
   }) => {
     try {
       const response = await fetch(
@@ -234,7 +233,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         let transformedData;
         if (strategy !== "supertrend")
           transformedData = convertBackendDataToEmaArray(data.data);
-        else transformedData = covertBackendDataToSupertrendArray(data.data);
+        else transformedData = convertBackendDataToSupertrendArray(data.data);
         setTickerData({
           ...tickerData,
           [strategy]: transformedData,
@@ -261,7 +260,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     row,
   }: {
     strategy: "ema" | "supertrend" | "zeroday";
-    row: EmaTicker | SupertrendTicker;
+    row: EmaTicker | SupertrendTicker | ZerodayTicker;
   }) => {
     try {
       const response = await fetch(
@@ -280,7 +279,10 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
       );
       const data = await response.json();
       if (data.success) {
-        const transformedData = convertBackendDataToEmaArray(data.data);
+        let transformedData;
+        if (strategy !== 'supertrend')
+          transformedData = convertBackendDataToEmaArray(data.data);
+        else transformedData = convertBackendDataToSupertrendArray(data.data)
         setTickerData({
           ...tickerData,
           [strategy]: transformedData,

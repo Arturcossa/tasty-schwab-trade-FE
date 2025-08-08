@@ -22,7 +22,7 @@ export function convertBackendDataToEmaArray(data: Record<string, string[]>): Em
   }))
 }
 
-export function covertBackendDataToSupertrendArray(data: Record<string, string[]>): SupertrendTicker[] {
+export function convertBackendDataToSupertrendArray(data: Record<string, string[]>): SupertrendTicker[] {
   return Object.entries(data).map(([symbol, values]) => ({
     symbol,
     timeframe: formatTimeFrame(values[0]),
