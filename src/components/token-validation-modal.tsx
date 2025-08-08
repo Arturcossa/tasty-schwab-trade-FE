@@ -45,10 +45,12 @@ const TokenValidationModal = () => {
   }, [isOpenTokenValidModal]);
 
   const handleTokenSubmit = async (e: React.FormEvent) => {
+    console.log("fjefjeiof")
     e.preventDefault();
     setIsValidating(true);
     setValidationError("");
     const result = await validateSchwabToken(tokenInput);
+    console.log('fjjijfe', result)
     setIsValidating(false);
 
     if (result.success) {
