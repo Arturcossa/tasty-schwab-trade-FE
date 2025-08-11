@@ -33,6 +33,8 @@ const AddNewTicker = () => {
     period_2: 1,
     schwab_quantity: 0,
     tastytrade_quantity: 0,
+    call_enabled: true,
+    put_enabled: true,
   });
 
   // Update form data helper
@@ -78,6 +80,8 @@ const AddNewTicker = () => {
       period_2: 1,
       schwab_quantity: 0,
       tastytrade_quantity: 0,
+      call_enabled: true,
+      put_enabled: true,
     });
   };
 
@@ -264,6 +268,44 @@ const AddNewTicker = () => {
                 );
               }}
             />
+          </div>
+
+          {/* Call Option Enabled */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Call Option Enabled</h3>
+            <Select
+              value={formData.call_enabled.toString()}
+              onValueChange={(value) =>
+                updateFormData("call_enabled", value === "true")
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">False</SelectItem>
+                <SelectItem value="true">True</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Put Option Enabled */}
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm">Put Option Enabled</h3>
+            <Select
+              value={formData.put_enabled.toString()}
+              onValueChange={(value) =>
+                updateFormData("put_enabled", value === "true")
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">False</SelectItem>
+                <SelectItem value="true">True</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
         <CardFooter className="flex gap-2">

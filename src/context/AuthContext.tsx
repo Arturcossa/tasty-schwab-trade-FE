@@ -12,14 +12,6 @@ import { toast } from "sonner";
 
 interface AuthContextType {
   user: { email: string; token: string } | null;
-  connectionStatus: {
-    schwab: boolean,
-    tasty: boolean,
-  }
-  setConnectionStatus: (api: {
-    schwab: boolean,
-    tasty: boolean,
-  } | ((prev: { schwab: boolean; tasty: boolean }) => { schwab: boolean; tasty: boolean })) => void;
   login: (
     email: string,
     password: string
@@ -117,7 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, connectionStatus, setConnectionStatus: updateConnectionStatus, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

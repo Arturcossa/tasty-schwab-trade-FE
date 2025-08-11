@@ -27,7 +27,7 @@ const StrategyControl = () => {
   return (
     <div className="w-full max-w-full overflow-hidden">
       <div className="space-y-6">
-        <Tabs defaultValue="ema" className="w-full" value={currentStrategy} onValueChange={() => setCurrentStrategy}>
+        <Tabs defaultValue="ema" className="w-full" value={currentStrategy} onValueChange={(value) => setCurrentStrategy(value as "ema" | "supertrend" | "zeroday")}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="ema">📊 EMA Crossover</TabsTrigger>
             <TabsTrigger value="supertrend">📈 Supertrend</TabsTrigger>

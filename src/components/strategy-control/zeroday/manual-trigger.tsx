@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2Icon, Play, Square, AlertTriangle } from "lucide-react";
+import { Loader2Icon, Play, Square, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { useTrading } from "@/context/TradingContext";
 
 const ManualTrigger = () => {
   const { user } = useAuth();
+  const { tickerData } = useTrading();
   const [isLoading, setIsLoading] = useState(false);
+  const [callEnabled, setCallEnabled] = useState(true);
+  const [putEnabled, setPutEnabled] = useState(true);
+  
+  // Get SPX ticker data to check if call/put options are enabled
+  useEffect(() => {
+    if (tickerData?.zeroday) {
+      const spxTicker = tickerData.zeroday.find(ticker => ticker.symbol === 'SPX');
+      if (spxTicker) {
+        setCallEnabled(spxTicker.call_enabled);
+        setPutEnabled(spxTicker.put_enabled);
+      }
+    }
+  }, [tickerData]);
 
   const handleManualTrigger = async (action: 'buy_call' | 'buy_put' | 'close_position') => {
     if (!user?.token) {
@@ -61,33 +76,59 @@ const ManualTrigger = () => {
       <CardContent className="space-y-6">
         {/* Manual Trigger Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button
-            onClick={() => handleManualTrigger('buy_call')}
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700 text-white"
-            size="lg"
-          >
-            {isLoading ? (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="mr-2 h-4 w-4" />
-            )}
-            Buy Call
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Button
+              onClick={() => handleManualTrigger('buy_call')}
+              disabled={isLoading || !callEnabled}
+              className={`${callEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400'} text-white`}
+              size="lg"
+            >
+              {isLoading ? (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Buy Call
+            </Button>
+            <div className="flex items-center justify-center text-xs mt-1">
+              {callEnabled ? (
+                <span className="flex items-center text-green-600">
+                  <CheckCircle className="h-3 w-3 mr-1" /> Enabled
+                </span>
+              ) : (
+                <span className="flex items-center text-red-600">
+                  <XCircle className="h-3 w-3 mr-1" /> Disabled
+                </span>
+              )}
+            </div>
+          </div>
 
-          <Button
-            onClick={() => handleManualTrigger('buy_put')}
-            disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700 text-white"
-            size="lg"
-          >
-            {isLoading ? (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="mr-2 h-4 w-4" />
-            )}
-            Buy Put
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Button
+              onClick={() => handleManualTrigger('buy_put')}
+              disabled={isLoading || !putEnabled}
+              className={`${putEnabled ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400'} text-white`}
+              size="lg"
+            >
+              {isLoading ? (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Buy Put
+            </Button>
+            <div className="flex items-center justify-center text-xs mt-1">
+              {putEnabled ? (
+                <span className="flex items-center text-green-600">
+                  <CheckCircle className="h-3 w-3 mr-1" /> Enabled
+                </span>
+              ) : (
+                <span className="flex items-center text-red-600">
+                  <XCircle className="h-3 w-3 mr-1" /> Disabled
+                </span>
+              )}
+            </div>
+          </div>
 
           <Button
             onClick={() => handleManualTrigger('close_position')}
@@ -138,4 +179,4 @@ const ManualTrigger = () => {
   );
 };
 
-export default ManualTrigger; 
+export default ManualTrigger;

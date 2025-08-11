@@ -45,6 +45,11 @@ interface TradingContextType {
   }) => void;
   currentStrategy: "ema" | "supertrend" | "zeroday";
   setCurrentStrategy: (s: "ema" | "supertrend" | "zeroday") => void;
+  connectionStatus: {
+    schwab: boolean;
+    tasty: boolean;
+  };
+  setConnectionStatus: (status: { schwab: boolean; tasty: boolean }) => void;
 }
 
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
@@ -58,7 +63,7 @@ export const useTrading = () => {
 };
 
 export const TradingProvider = ({ children }: { children: ReactNode }) => {
-  const { user, connectionStatus, setConnectionStatus } = useAuth();
+  const { user } = useAuth();
   const [isOpenTokenValidModal, setIsOpenTokenValidModal] = useState(false);
   const [isTokenValidated, setIsTokenValidated] = useState(false);
   const [tickerData, setTickerData] = useState<TickerData>({
@@ -67,6 +72,11 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
     zeroday: [],
   });
   const [currentStrategy, setCurrentStrategy] = useState<"ema" | "supertrend" | "zeroday">("ema")
+  const [connectionStatus, setConnectionStatus] = useState({
+    schwab: false,
+    tasty: false,
+  })
+
 
   const validateSchwabToken = async (
     token: string
@@ -317,7 +327,9 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         saveTickerData,
         deleteTickerData,
         currentStrategy, 
-        setCurrentStrategy
+        setCurrentStrategy,
+        connectionStatus,
+        setConnectionStatus,
       }}
     >
       {children}

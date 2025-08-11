@@ -26,10 +26,12 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 // import { useTrading } from "@/context/TradingContext";
 import PlayButtons from "./play-buttons";
+import { useTrading } from "@/context/TradingContext";
 
 const AppSidebar = () => {
   const pathname = usePathname();
-  const { logout, connectionStatus } = useAuth();
+  const { logout } = useAuth();
+  const { connectionStatus } = useTrading();
   // const { setIsOpenTokenValidModal, getConnectionTasty } = useTrading();
 
   // const handleGetSchwabToken = (api: 'schwab' | 'tasty') => {
@@ -85,48 +87,7 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <hr />
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <div className="space-y-3 p-3">
-              <div className="flex items-center space-x-2 justify-between">
-                <span className="text-sm text-black font-bold">TastyTrade</span>
-                <div className="flex items-center gap-3">
-                  {connectionStatus.tasty ? (
-                    <Wifi className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <>
-                      {/* <CirclePlay
-                        className="h-5 w-5 text-gray-500 cursor-pointer hover:scale-105"
-                        type="button"
-                        onClick={() => handleGetSchwabToken('tasty')}
-                      /> */}
-                      <WifiOff className="h-5 w-5 text-red-500" />
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2 justify-between">
-                <span className="text-sm text-black font-bold">Schwab</span>
-                <div className="flex items-center gap-3">
-                  {connectionStatus.schwab ? (
-                    <Wifi className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <>
-                      {/* <CirclePlay
-                        className="h-5 w-5 text-gray-500 cursor-pointer hover:scale-105"
-                        type="button"
-                        onClick={() => handleGetSchwabToken('schwab')}
-                      /> */}
-                      <WifiOff className="h-5 w-5 text-red-500" />
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        
         <hr />
         <SidebarGroup>
           <SidebarGroupContent>

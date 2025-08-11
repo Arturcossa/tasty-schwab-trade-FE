@@ -75,6 +75,8 @@ const TradingParameters = () => {
                   <TableHead>P2</TableHead>
                   <TableHead>SQty</TableHead>
                   <TableHead>TQty</TableHead>
+                  <TableHead>Call</TableHead>
+                  <TableHead>Put</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -82,7 +84,7 @@ const TradingParameters = () => {
                 {isLoading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={10}
+                      colSpan={12}
                       className="text-center py-8 text-muted-foreground"
                     >
                       <div className="flex flex-col items-center gap-2">
@@ -263,6 +265,52 @@ const TradingParameters = () => {
                               className="w-20 text-xs"
                             />
                           </TableCell>
+                          <TableCell>
+                            <Select
+                              value={String(editRow?.call_enabled)}
+                              onValueChange={(val) =>
+                                setEditRow((r: any) => ({
+                                  ...r,
+                                  call_enabled: val === "true",
+                                }))
+                              }
+                            >
+                              <SelectTrigger className="w-24 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem className="text-xs" value="true">
+                                  Enabled
+                                </SelectItem>
+                                <SelectItem className="text-xs" value="false">
+                                  Disabled
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={String(editRow?.put_enabled)}
+                              onValueChange={(val) =>
+                                setEditRow((r: any) => ({
+                                  ...r,
+                                  put_enabled: val === "true",
+                                }))
+                              }
+                            >
+                              <SelectTrigger className="w-24 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem className="text-xs" value="true">
+                                  Enabled
+                                </SelectItem>
+                                <SelectItem className="text-xs" value="false">
+                                  Disabled
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"
@@ -315,6 +363,28 @@ const TradingParameters = () => {
                           <TableCell>{row.period_2}</TableCell>
                           <TableCell>{row.schwab_quantity}</TableCell>
                           <TableCell>{row.tastytrade_quantity}</TableCell>
+                          <TableCell>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                row.call_enabled
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {row.call_enabled ? "Enabled" : "Disabled"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                row.put_enabled
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {row.put_enabled ? "Enabled" : "Disabled"}
+                            </span>
+                          </TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"

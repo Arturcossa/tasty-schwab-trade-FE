@@ -27,7 +27,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (user && !isRedirecting) {
       setIsRedirecting(true);
-      router.push("/dashboard");
+      router.push("/dashboard/strategy-control");
     }
   }, [user, router, isRedirecting]);
 
@@ -80,11 +80,11 @@ export default function LoginPage() {
                     required
                   />
                   <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -94,11 +94,12 @@ export default function LoginPage() {
                   </Button>
                 </div>
               </div>
-              
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <LoaderIcon className="animate-spin" />}
-                {loading ? "Logging in..." : "Login"}
-              </Button>
+              <div className="pt-10">
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading && <LoaderIcon className="animate-spin" />}
+                  {loading ? "Logging in..." : "Login"}
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
