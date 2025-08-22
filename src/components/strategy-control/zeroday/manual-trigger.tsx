@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2Icon, Play, Square, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Loader2Icon, Play, Square, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { useTrading } from "@/context/TradingContext";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const ManualTrigger = () => {
   const { user } = useAuth();
@@ -14,7 +16,9 @@ const ManualTrigger = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [callEnabled, setCallEnabled] = useState(true);
   const [putEnabled, setPutEnabled] = useState(true);
-  
+  const [strike, setStrike] = useState<string>("");
+  const [expiration, setExpiration] = useState<string>("");
+
   // Get SPX ticker data to check if call/put options are enabled
   useEffect(() => {
     if (tickerData?.zeroday) {
@@ -35,7 +39,7 @@ const ManualTrigger = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/manual-spx-trigger', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/manual-spx-trigger`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +47,9 @@ const ManualTrigger = () => {
         },
         body: JSON.stringify({
           action: action,
-          symbol: 'SPX'
+          symbol: 'SPX',
+          strike: strike ? Number(strike) : undefined,
+          expiration: expiration || undefined
         })
       });
 
@@ -74,6 +80,28 @@ const ManualTrigger = () => {
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Optional overrides */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-xs">Strike (optional)</Label>
+            <Input
+              type="number"
+              placeholder="ATM by default"
+              value={strike}
+              onChange={(e) => setStrike(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs">Expiration (YYYY-MM-DD, optional)</Label>
+            <Input
+              type="text"
+              placeholder="Today by default"
+              value={expiration}
+              onChange={(e) => setExpiration(e.target.value)}
+            />
+          </div>
+        </div>
+
         {/* Manual Trigger Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col gap-1">
@@ -90,17 +118,6 @@ const ManualTrigger = () => {
               )}
               Buy Call
             </Button>
-            <div className="flex items-center justify-center text-xs mt-1">
-              {callEnabled ? (
-                <span className="flex items-center text-green-600">
-                  <CheckCircle className="h-3 w-3 mr-1" /> Enabled
-                </span>
-              ) : (
-                <span className="flex items-center text-red-600">
-                  <XCircle className="h-3 w-3 mr-1" /> Disabled
-                </span>
-              )}
-            </div>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -117,17 +134,6 @@ const ManualTrigger = () => {
               )}
               Buy Put
             </Button>
-            <div className="flex items-center justify-center text-xs mt-1">
-              {putEnabled ? (
-                <span className="flex items-center text-green-600">
-                  <CheckCircle className="h-3 w-3 mr-1" /> Enabled
-                </span>
-              ) : (
-                <span className="flex items-center text-red-600">
-                  <XCircle className="h-3 w-3 mr-1" /> Disabled
-                </span>
-              )}
-            </div>
           </div>
 
           <Button
@@ -143,21 +149,6 @@ const ManualTrigger = () => {
             )}
             Close Position
           </Button>
-        </div>
-
-        {/* Configuration Warning */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-blue-800">
-                Configuration Required
-              </p>
-              <p className="text-xs text-blue-700 mt-1">
-                To place actual trades, configure the Schwab and TastyTrade quantities in the SPX 0-day options settings. Currently, both are set to 0, so no orders will be placed.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Manual Trading Warning */}

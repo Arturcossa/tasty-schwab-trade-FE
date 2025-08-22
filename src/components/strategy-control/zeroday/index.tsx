@@ -1,16 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card"
-import AddNewTicker from "./add-new-ticker"
-import TradingParameters from "./trading-parameters"
 import ManualTrigger from "./manual-trigger"
+import TradingParameters from "./trading-parameters"
+import AddNewTicker from "./add-new-ticker"
 
 const StrategyZeroDay = () => {
 
   return (
     <Card>
       <CardContent className="space-y-10">
+        <ManualTrigger />
         <AddNewTicker />
         <TradingParameters />
-        <ManualTrigger />
       </CardContent>
     </Card>
   )

@@ -37,23 +37,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ email: string; token: string } | null>(
     null
   );
-  const [connectionStatus, setConnectionStatus] = useState<{
-    schwab: boolean;
-    tasty: boolean;
-  }>({
-    schwab: false,
-    tasty: false,
-  });
+  // const [connectionStatus, setConnectionStatus] = useState<{
+  //   schwab: boolean;
+  //   tasty: boolean;
+  // }>({
+  //   schwab: false,
+  //   tasty: false,
+  // });
 
-  const updateConnectionStatus = (
-    value: { schwab: boolean; tasty: boolean } | ((prev: { schwab: boolean; tasty: boolean }) => { schwab: boolean; tasty: boolean })
-  ) => {
-    if (typeof value === 'function') {
-      setConnectionStatus(value);
-    } else {
-      setConnectionStatus(value);
-    }
-  };
+  // const updateConnectionStatus = (
+  //   value: { schwab: boolean; tasty: boolean } | ((prev: { schwab: boolean; tasty: boolean }) => { schwab: boolean; tasty: boolean })
+  // ) => {
+  //   if (typeof value === 'function') {
+  //     setConnectionStatus(value);
+  //   } else {
+  //     setConnectionStatus(value);
+  //   }
+  // };
   const router = useRouter();
 
   useEffect(() => {
@@ -78,10 +78,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (res.ok && data.success) {
         setUser({ email: email, token: data.token });
-        setConnectionStatus({
-          schwab: data.refreshToken ? true : false,
-          tasty: data.tastyToken ? true : false,
-        });
+        // setConnectionStatus({
+        //   schwab: data.refreshToken ? true : false,
+        //   tasty: data.tastyToken ? true : false,
+        // });
         toast.success("Successful login!", {
           className: "toast-success",
         });
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         success: false,
         message: data.message,
       };
-    } catch (err) {
+    } catch {
       toast.error(`Network error`, {
         className: "toast-error",
       });

@@ -11,6 +11,7 @@ import { TickerData } from "@/lib/type";
 import {
   convertBackendDataToEmaArray,
   convertBackendDataToSupertrendArray,
+  convertBackendDataToZerodayArray,
 } from "@/lib/functions";
 import { toast } from "sonner";
 import { EmaTicker } from "@/lib/ema-datas";
@@ -35,7 +36,7 @@ interface TradingContextType {
   }: {
     strategy: "ema" | "supertrend" | "zeroday";
     row: EmaTicker | SupertrendTicker | ZerodayTicker;
-  }) => Promise<any>;
+  }) => Promise<void>;
   deleteTickerData: ({
     strategy,
     row,
@@ -117,7 +118,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
           message: data.message || "Token validation failed",
         };
       }
-    } catch (error) {
+    } catch {
       setIsTokenValidated(false)
       toast.error("Network error during token validation", {
         className: "toast-error",
@@ -162,7 +163,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         });
         return { success: false, message: data.message || "Connection to Tastytrade failed" };
       }
-    } catch (error) {
+    } catch {
       setConnectionStatus({
         ...connectionStatus,
         tasty: false,
@@ -194,9 +195,10 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok && data.success && data.data) {
         // Transform backend data to frontend format
         let transformedData;
-        if (strategy !== "supertrend")
+        if (strategy === "ema")
           transformedData = convertBackendDataToEmaArray(data.data);
-        else transformedData = convertBackendDataToSupertrendArray(data.data);
+        else if (strategy === "supertrend") transformedData = convertBackendDataToSupertrendArray(data.data);
+        else if (strategy === "zeroday") transformedData = convertBackendDataToZerodayArray(data.data);
 
         setTickerData({
           ...tickerData,
@@ -326,7 +328,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
         setTickerData: updateTickerData,
         saveTickerData,
         deleteTickerData,
-        currentStrategy, 
+        currentStrategy,
         setCurrentStrategy,
         connectionStatus,
         setConnectionStatus,

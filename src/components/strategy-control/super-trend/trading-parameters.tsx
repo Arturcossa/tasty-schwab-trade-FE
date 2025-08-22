@@ -20,6 +20,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Pencil, Trash2, Check, X, Loader2Icon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { SupertrendTicker, timeframes } from "@/lib/supertrend-datas";
 import { useTrading } from "@/context/TradingContext";
 
@@ -40,14 +41,14 @@ const TradingParameters = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      await getTickerData("supertrend");
+      getTickerData("supertrend");
       setIsLoading(false);
     };
 
     fetchData();
   }, []);
 
-  const handleEdit = (row: any, idx: number) => {
+  const handleEdit = (row: SupertrendTicker, idx: number) => {
     setEditingIdx(idx);
     setEditRow({ ...row });
   };
@@ -119,10 +120,7 @@ const TradingParameters = () => {
                             <Select
                               value={String(editRow?.trade_enabled)}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  trade_enabled: val === "true",
-                                }))
+                                setEditRow((r) => (r ? { ...r, trade_enabled: val === "true" } : r))
                               }
                             >
                               <SelectTrigger className="w-24 text-xs">
@@ -142,10 +140,7 @@ const TradingParameters = () => {
                             <Select
                               value={editRow?.timeframe}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  timeframe: val,
-                                }))
+                                setEditRow((r) => (r ? { ...r, timeframe: val } : r))
                               }
                             >
                               <SelectTrigger className="w-24 text-xs">
@@ -171,10 +166,7 @@ const TradingParameters = () => {
                               step="any"
                               value={editRow?.schwab_quantity}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  schwab_quantity: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, schwab_quantity: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -186,10 +178,7 @@ const TradingParameters = () => {
                               step="any"
                               value={editRow?.tastytrade_quantity}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  tastytrade_quantity: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, tastytrade_quantity: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -200,10 +189,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.short_ma_length}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  short_ma_length: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, short_ma_length: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -212,10 +198,7 @@ const TradingParameters = () => {
                             <Select
                               value={editRow?.short_ma_type}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  short_ma_type: val,
-                                }))
+                                setEditRow((r) => (r ? { ...r, short_ma_type: val } : r))
                               }
                             >
                               <SelectTrigger className="w-full text-xs">
@@ -240,10 +223,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.mid_ma_length}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  mid_ma_length: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, mid_ma_length: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -252,10 +232,7 @@ const TradingParameters = () => {
                             <Select
                               value={editRow?.mid_ma_type}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  mid_ma_type: val,
-                                }))
+                                setEditRow((r) => (r ? { ...r, mid_ma_type: val } : r))
                               }
                             >
                               <SelectTrigger className="w-full text-xs">
@@ -280,10 +257,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.long_ma_length}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  long_ma_length: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, long_ma_length: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -292,10 +266,7 @@ const TradingParameters = () => {
                             <Select
                               value={editRow?.long_ma_type}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  long_ma_type: val,
-                                }))
+                                setEditRow((r) => (r ? { ...r, long_ma_type: val } : r))
                               }
                             >
                               <SelectTrigger className="w-full text-xs">
@@ -320,10 +291,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.zigzag_percent_reversal}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  zigzag_percent_reversal: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, zigzag_percent_reversal: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -334,10 +302,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.atr_length}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  atr_length: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, atr_length: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -348,10 +313,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.zigzag_atr_multiple}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  zigzag_atr_multiple: Number(e.target.value),
-                                }))
+                                setEditRow((r) => (r ? { ...r, zigzag_atr_multiple: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -360,10 +322,7 @@ const TradingParameters = () => {
                             <Select
                               value={String(editRow?.fibonacci_enabled)}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  fibonacci_enabled: val === "true",
-                                }))
+                                setEditRow((r) => (r ? { ...r, fibonacci_enabled: val === "true" } : r))
                               }
                             >
                               <SelectTrigger className="w-24 text-xs">
@@ -383,10 +342,7 @@ const TradingParameters = () => {
                             <Select
                               value={String(editRow?.support_demand_enabled)}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  support_demand_enabled: val === "true",
-                                }))
+                                setEditRow((r) => (r ? { ...r, support_demand_enabled: val === "true" } : r))
                               }
                             >
                               <SelectTrigger className="w-24 text-xs">
@@ -434,15 +390,17 @@ const TradingParameters = () => {
                       ) : (
                         <>
                           <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-semibold ${
-                                row.trade_enabled
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {row.trade_enabled ? "Enabled" : "Disabled"}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={row.trade_enabled}
+                                onCheckedChange={async (val) => {
+                                  await saveTickerData({ strategy: "supertrend", row: { ...row, trade_enabled: val } });
+                                }}
+                              />
+                              <span className="text-xs text-muted-foreground">
+                                {row.trade_enabled ? "Enabled" : "Disabled"}
+                              </span>
+                            </div>
                           </TableCell>
                           <TableCell>{row.timeframe}</TableCell>
                           <TableCell>{row.schwab_quantity}</TableCell>

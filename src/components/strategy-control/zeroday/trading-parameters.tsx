@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Pencil, Trash2, Check, X, Loader2Icon } from "lucide-react";
 import { timeframes, ZerodayTicker } from "@/lib/zeroday-datas";
 import { useTrading } from "@/context/TradingContext";
@@ -47,7 +48,7 @@ const TradingParameters = () => {
     fetchData();
   }, []);
 
-  const handleEdit = (row: any, idx: number) => {
+  const handleEdit = (row: ZerodayTicker, idx: number) => {
     setEditingIdx(idx);
     setEditRow({ ...row });
   };
@@ -57,26 +58,58 @@ const TradingParameters = () => {
     setEditRow(null);
   };
 
+  const handleToggleTradeEnabled = async (row: ZerodayTicker, newValue: boolean) => {
+    const updatedRow = { ...row, trade_enabled: newValue };
+    await saveTickerData({
+      strategy: "zeroday",
+      row: updatedRow,
+    });
+  };
+
+  const handleToggleCallEnabled = async (row: ZerodayTicker, newValue: boolean) => {
+    const updatedRow = { ...row, call_enabled: newValue };
+    await saveTickerData({
+      strategy: "zeroday",
+      row: updatedRow,
+    });
+  };
+
+  const handleTogglePutEnabled = async (row: ZerodayTicker, newValue: boolean) => {
+    const updatedRow = { ...row, put_enabled: newValue };
+    await saveTickerData({
+      strategy: "zeroday",
+      row: updatedRow,
+    });
+  };
+
+  // Filter to show only SPX tickers
+  const spxTickers = tickerData.zeroday?.filter(ticker => ticker.symbol === 'SPX') || [];
+
   return (
     <div className="space-y-4">
-      <h2 className="font-semibold text-xl">Current Trading Parameters</h2>
       <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">SPX 0-Day Options Configuration</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Configure moving average parameters and option settings for SPX 0-day options strategy
+          </p>
+        </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table className="min-w-[850px]">
+            <Table className="min-w-[900px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Symbol</TableHead>
-                  <TableHead>Trade</TableHead>
-                  <TableHead>TF</TableHead>
-                  <TableHead>TL1</TableHead>
-                  <TableHead>P1</TableHead>
-                  <TableHead>TL2</TableHead>
-                  <TableHead>P2</TableHead>
-                  <TableHead>SQty</TableHead>
-                  <TableHead>TQty</TableHead>
+                  <TableHead>Enable</TableHead>
                   <TableHead>Call</TableHead>
                   <TableHead>Put</TableHead>
+                  <TableHead>TF</TableHead>
+                  <TableHead>MA1</TableHead>
+                  <TableHead>P1</TableHead>
+                  <TableHead>MA2</TableHead>
+                  <TableHead>P2</TableHead>
+                  <TableHead>Schwab Qty</TableHead>
+                  <TableHead>Tasty Qty</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -88,15 +121,15 @@ const TradingParameters = () => {
                       className="text-center py-8 text-muted-foreground"
                     >
                       <div className="flex flex-col items-center gap-2">
+                        <Loader2Icon className="animate-spin" />
                         <div className="text-sm text-muted-foreground">
-                          <Loader2Icon className="animate-spin" />
-                          Loading
+                          Loading SPX configuration
                         </div>
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : tickerData.zeroday && tickerData.zeroday.length > 0 ? (
-                  tickerData.zeroday.map((row, idx) => (
+                ) : spxTickers.length > 0 ? (
+                  spxTickers.map((row, idx) => (
                     <TableRow
                       key={idx}
                       className="hover:bg-gray-100 transition-colors"
@@ -104,39 +137,43 @@ const TradingParameters = () => {
                       <TableCell className="font-medium">
                         {row.symbol}
                       </TableCell>
+
+                      {/* Inline Enable Toggle */}
+                      <TableCell>
+                        <Switch
+                          checked={row.trade_enabled}
+                          onCheckedChange={(checked) => handleToggleTradeEnabled(row, checked)}
+                          aria-label="Toggle trading"
+                        />
+                      </TableCell>
+
+                      {/* Call Enable Toggle */}
+                      <TableCell>
+                        <Switch
+                          checked={row.call_enabled}
+                          onCheckedChange={(checked) => handleToggleCallEnabled(row, checked)}
+                          disabled={!row.trade_enabled}
+                          aria-label="Toggle call options"
+                        />
+                      </TableCell>
+
+                      {/* Put Enable Toggle */}
+                      <TableCell>
+                        <Switch
+                          checked={row.put_enabled}
+                          onCheckedChange={(checked) => handleTogglePutEnabled(row, checked)}
+                          disabled={!row.trade_enabled}
+                          aria-label="Toggle put options"
+                        />
+                      </TableCell>
+
                       {editingIdx === idx ? (
                         <>
                           <TableCell>
                             <Select
-                              value={String(editRow?.trade_enabled)}
-                              onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  trade_enabled: val === "true",
-                                }))
-                              }
-                            >
-                              <SelectTrigger className="w-24 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem className="text-xs" value="true">
-                                  Enabled
-                                </SelectItem>
-                                <SelectItem className="text-xs" value="false">
-                                  Disabled
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Select
                               value={editRow?.timeframe}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  timeframe: val,
-                                }))
+                                setEditRow(r => (r ? { ...r, timeframe: val } : r))
                               }
                             >
                               <SelectTrigger className="w-24 text-xs">
@@ -159,10 +196,7 @@ const TradingParameters = () => {
                             <Select
                               value={editRow?.trend_line_1}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  trend_line_1: val,
-                                }))
+                                setEditRow(r => (r ? { ...r, trend_line_1: val } : r))
                               }
                             >
                               <SelectTrigger className="w-full text-xs">
@@ -187,10 +221,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.period_1}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  period_1: Number(e.target.value),
-                                }))
+                                setEditRow(r => (r ? { ...r, period_1: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -199,10 +230,7 @@ const TradingParameters = () => {
                             <Select
                               value={editRow?.trend_line_2}
                               onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  trend_line_2: val,
-                                }))
+                                setEditRow(r => (r ? { ...r, trend_line_2: val } : r))
                               }
                             >
                               <SelectTrigger className="w-full text-xs">
@@ -227,10 +255,7 @@ const TradingParameters = () => {
                               min={1}
                               value={editRow?.period_2}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  period_2: Number(e.target.value),
-                                }))
+                                setEditRow(r => (r ? { ...r, period_2: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -242,10 +267,7 @@ const TradingParameters = () => {
                               step="any"
                               value={editRow?.schwab_quantity}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  schwab_quantity: Number(e.target.value),
-                                }))
+                                setEditRow(r => (r ? { ...r, schwab_quantity: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
@@ -257,59 +279,10 @@ const TradingParameters = () => {
                               step="any"
                               value={editRow?.tastytrade_quantity}
                               onChange={(e) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  tastytrade_quantity: Number(e.target.value),
-                                }))
+                                setEditRow(r => (r ? { ...r, tastytrade_quantity: Number(e.target.value) } : r))
                               }
                               className="w-20 text-xs"
                             />
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={String(editRow?.call_enabled)}
-                              onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  call_enabled: val === "true",
-                                }))
-                              }
-                            >
-                              <SelectTrigger className="w-24 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem className="text-xs" value="true">
-                                  Enabled
-                                </SelectItem>
-                                <SelectItem className="text-xs" value="false">
-                                  Disabled
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={String(editRow?.put_enabled)}
-                              onValueChange={(val) =>
-                                setEditRow((r: any) => ({
-                                  ...r,
-                                  put_enabled: val === "true",
-                                }))
-                              }
-                            >
-                              <SelectTrigger className="w-24 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem className="text-xs" value="true">
-                                  Enabled
-                                </SelectItem>
-                                <SelectItem className="text-xs" value="false">
-                                  Disabled
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
                           </TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
@@ -341,50 +314,17 @@ const TradingParameters = () => {
                         </>
                       ) : (
                         <>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-semibold ${
-                                row.trade_enabled
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {row.trade_enabled ? "Enabled" : "Disabled"}
-                            </span>
-                          </TableCell>
-                          <TableCell>{row.timeframe}</TableCell>
-                          <TableCell className="uppercase">
+                          <TableCell className="text-sm">{row.timeframe}</TableCell>
+                          <TableCell className="text-sm uppercase">
                             {row.trend_line_1}
                           </TableCell>
-                          <TableCell>{row.period_1}</TableCell>
-                          <TableCell className="uppercase">
+                          <TableCell className="text-sm">{row.period_1}</TableCell>
+                          <TableCell className="text-sm uppercase">
                             {row.trend_line_2}
                           </TableCell>
-                          <TableCell>{row.period_2}</TableCell>
-                          <TableCell>{row.schwab_quantity}</TableCell>
-                          <TableCell>{row.tastytrade_quantity}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-semibold ${
-                                row.call_enabled
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {row.call_enabled ? "Enabled" : "Disabled"}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-semibold ${
-                                row.put_enabled
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {row.put_enabled ? "Enabled" : "Disabled"}
-                            </span>
-                          </TableCell>
+                          <TableCell className="text-sm">{row.period_2}</TableCell>
+                          <TableCell className="text-sm">{row.schwab_quantity}</TableCell>
+                          <TableCell className="text-sm">{row.tastytrade_quantity}</TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"
@@ -400,7 +340,7 @@ const TradingParameters = () => {
                               onClick={() => {
                                 if (
                                   confirm(
-                                    "Are you sure you want to delete this ticker?"
+                                    "Are you sure you want to delete this SPX configuration?"
                                   )
                                 ) {
                                   deleteTickerData({
@@ -421,15 +361,15 @@ const TradingParameters = () => {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={10}
+                      colSpan={12}
                       className="text-center py-8 text-muted-foreground"
                     >
                       <div className="flex flex-col items-center gap-2">
                         <div className="text-lg font-medium">
-                          No results found
+                          No SPX Configuration Found
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          No trading parameters configured yet
+                          Add SPX 0-day options configuration above to get started
                         </div>
                       </div>
                     </TableCell>

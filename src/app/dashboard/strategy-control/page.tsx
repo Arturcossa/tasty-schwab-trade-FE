@@ -8,6 +8,7 @@ import StrategySuperTrend from "@/components/strategy-control/super-trend";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StrategyZeroDay from "@/components/strategy-control/zeroday";
 import { useTrading } from "@/context/TradingContext";
+import StrategyToolbar from "@/components/strategy-control/strategy-toolbar";
 
 const StrategyControl = () => {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ const StrategyControl = () => {
   return (
     <div className="w-full max-w-full overflow-hidden">
       <div className="space-y-6">
+        <StrategyToolbar />
         <Tabs defaultValue="ema" className="w-full" value={currentStrategy} onValueChange={(value) => setCurrentStrategy(value as "ema" | "supertrend" | "zeroday")}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="ema">📊 EMA Crossover</TabsTrigger>

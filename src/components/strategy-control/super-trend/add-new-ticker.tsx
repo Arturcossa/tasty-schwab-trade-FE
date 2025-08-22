@@ -46,7 +46,7 @@ const AddNewTicker = () => {
   });
 
   // Update form data helper
-  const updateFormData = (field: keyof SupertrendTicker, value: any) => {
+  const updateFormData = <K extends keyof SupertrendTicker>(field: K, value: SupertrendTicker[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -72,6 +72,9 @@ const AddNewTicker = () => {
     if (!formData.timeframe) return "Please select a time frame";
     // if (formData.period_1 < 1) return "Period 1 must be greater than 0";
     // if (formData.period_2 < 1) return "Period 2 must be greater than 0";
+    if (formData.short_ma_length >= formData.mid_ma_length) return "Short MA must be shorter than Mid MA"
+    if (formData.mid_ma_length >= formData.long_ma_length) return "Mid MA must be shorter than Long MA"
+    if (formData.atr_length < 1) return "ATR Length must be greater than 0"
     if (formData.schwab_quantity < 0)
       return "Schwab quantity must be greater than 0";
     if (formData.tastytrade_quantity < 0)

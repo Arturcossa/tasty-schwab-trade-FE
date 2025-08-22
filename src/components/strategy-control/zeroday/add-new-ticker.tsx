@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -12,7 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { symbols, timeframes, ZerodayTicker } from "@/lib/zeroday-datas";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { timeframes, ZerodayTicker } from "@/lib/zeroday-datas";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
@@ -26,11 +28,11 @@ const AddNewTicker = () => {
   const [formData, setFormData] = useState<ZerodayTicker>({
     symbol: "SPX",
     trade_enabled: false,
-    timeframe: "",
+    timeframe: "5Min",
     trend_line_1: "EMA",
-    period_1: 1,
+    period_1: 9,
     trend_line_2: "EMA",
-    period_2: 1,
+    period_2: 21,
     schwab_quantity: 0,
     tastytrade_quantity: 0,
     call_enabled: true,
@@ -38,7 +40,7 @@ const AddNewTicker = () => {
   });
 
   // Update form data helper
-  const updateFormData = (field: keyof ZerodayTicker, value: any) => {
+  const updateFormData = <K extends keyof ZerodayTicker>(field: K, value: ZerodayTicker[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -61,10 +63,15 @@ const AddNewTicker = () => {
     if (!formData.timeframe) return "Please select a time frame";
     if (formData.period_1 < 1) return "Period 1 must be greater than 0";
     if (formData.period_2 < 1) return "Period 2 must be greater than 0";
-    if (formData.schwab_quantity < 0)
-      return "Schwab quantity must be greater than 0";
-    if (formData.tastytrade_quantity < 0)
-      return "TastyTrade quantity must be greater than 0";
+    if (formData.period_1 >= formData.period_2) return "Period 1 must be shorter than Period 2";
+    if (formData.schwab_quantity < 0) return "Schwab quantity must be 0 or greater";
+    if (formData.tastytrade_quantity < 0) return "TastyTrade quantity must be 0 or greater";
+    if (formData.schwab_quantity === 0 && formData.tastytrade_quantity === 0) {
+      return "At least one broker quantity must be greater than 0";
+    }
+    if (!formData.call_enabled && !formData.put_enabled) {
+      return "At least one option type (Call or Put) must be enabled";
+    }
     return null;
   };
 
@@ -73,11 +80,11 @@ const AddNewTicker = () => {
     setFormData({
       symbol: "SPX",
       trade_enabled: false,
-      timeframe: "",
+      timeframe: "5Min",
       trend_line_1: "EMA",
-      period_1: 1,
+      period_1: 9,
+      period_2: 21,
       trend_line_2: "EMA",
-      period_2: 1,
       schwab_quantity: 0,
       tastytrade_quantity: 0,
       call_enabled: true,
@@ -97,215 +104,189 @@ const AddNewTicker = () => {
     setIsLoading(true);
     await saveTickerData({ strategy: "zeroday", row: formData });
     setIsLoading(false);
+    resetForm();
+    toast.success("SPX 0-day options configuration added successfully");
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="font-semibold text-xl">
-        Trading Parameters Configuration
-      </h2>
       <Card>
-        <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 pt-6">
-          {/* Symbol Selection */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Symbol</h3>
-            <Select
-              value={formData.symbol}
-              onValueChange={(value) => updateFormData("symbol", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a symbol" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Symbols</SelectLabel>
-                  {symbols.map((symbol) => (
-                    <SelectItem value={symbol} key={symbol}>
-                      {symbol}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+        <CardHeader>
+          <CardTitle className="text-lg">Add SPX 0-Day Options Configuration</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Configure new SPX 0-day options strategy with moving average parameters
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
 
-          {/* Trade Enabled */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Trade Enabled</h3>
-            <Select
-              value={formData.trade_enabled.toString()}
-              onValueChange={(value) =>
-                updateFormData("trade_enabled", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+            {/* Symbol Selection - Locked to SPX */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Symbol</Label>
+              <Input
+                value="SPX"
+                disabled
+                className="w-full bg-gray-50"
+              />
+            </div>
 
-          {/* Time Frame */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Time Frame</h3>
-            <Select
-              value={formData.timeframe}
-              onValueChange={(value) => updateFormData("timeframe", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a timeframe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>TimeFrames</SelectLabel>
-                  {timeframes.map((timeframe) => (
-                    <SelectItem key={timeframe} value={timeframe}>
-                      {timeframe}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Trade Enabled */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm font-medium">Enable Strategy</Label>
+              <div className="flex items-center space-x-2 h-full">
+                <Switch
+                  checked={formData.trade_enabled}
+                  onCheckedChange={(checked) => updateFormData("trade_enabled", checked)}
+                />
+                <span className="text-sm">{formData.trade_enabled ? "Enabled" : "Disabled"}</span>
+              </div>
+            </div>
 
-          {/* Trend Line 1 */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Trend Line 1</h3>
-            <Select
-              value={formData.trend_line_1}
-              onValueChange={(value) => updateFormData("trend_line_1", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select trend line" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="EMA">EMA</SelectItem>
-                <SelectItem value="SMA">SMA</SelectItem>
-                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Time Frame */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Time Frame</Label>
+              <Select
+                value={formData.timeframe}
+                onValueChange={(value) => updateFormData("timeframe", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a timeframe" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>TimeFrames</SelectLabel>
+                    {timeframes.map((timeframe) => (
+                      <SelectItem key={timeframe} value={timeframe}>
+                        {timeframe}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Period 1 */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Period 1</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step={1}
-              inputMode="numeric"
-              value={formData.period_1}
-              onChange={(e) => handlePeriodChange("period_1", e.target.value)}
-            />
-          </div>
+            {/* Moving Average 1 */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Short MA Type</Label>
+              <Select
+                value={formData.trend_line_1}
+                onValueChange={(value) => updateFormData("trend_line_1", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select MA type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMA">EMA</SelectItem>
+                  <SelectItem value="SMA">SMA</SelectItem>
+                  <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Trend Line 2 */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Trend Line 2</h3>
-            <Select
-              value={formData.trend_line_2}
-              onValueChange={(value) => updateFormData("trend_line_2", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select trend line" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="EMA">EMA</SelectItem>
-                <SelectItem value="SMA">SMA</SelectItem>
-                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Period 1 */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Short MA Period</Label>
+              <Input
+                className="w-full"
+                type="number"
+                min={1}
+                step={1}
+                inputMode="numeric"
+                value={formData.period_1}
+                onChange={(e) => handlePeriodChange("period_1", e.target.value)}
+              />
+            </div>
 
-          {/* Period 2 */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Period 2</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step={1}
-              inputMode="numeric"
-              value={formData.period_2}
-              onChange={(e) => handlePeriodChange("period_2", e.target.value)}
-            />
-          </div>
+            {/* Moving Average 2 */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Long MA Type</Label>
+              <Select
+                value={formData.trend_line_2}
+                onValueChange={(value) => updateFormData("trend_line_2", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select MA type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMA">EMA</SelectItem>
+                  <SelectItem value="SMA">SMA</SelectItem>
+                  <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Schwab Quantity */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Schwab Quantity</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={formData.schwab_quantity}
-              onChange={(e) =>
-                updateFormData("schwab_quantity", Number(e.target.value) || 0)
-              }
-            />
-          </div>
+            {/* Period 2 */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Long MA Period</Label>
+              <Input
+                className="w-full"
+                type="number"
+                min={1}
+                step={1}
+                inputMode="numeric"
+                value={formData.period_2}
+                onChange={(e) => handlePeriodChange("period_2", e.target.value)}
+              />
+            </div>
 
-          {/* TastyTrade Quantity */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">TastyTrade Quantity</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={formData.tastytrade_quantity}
-              onChange={(e) => {
-                updateFormData(
-                  "tastytrade_quantity",
-                  Number(e.target.value) || 0
-                );
-              }}
-            />
-          </div>
+            {/* Schwab Quantity */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Schwab Quantity</Label>
+              <Input
+                className="w-full"
+                type="number"
+                min={0}
+                step="any"
+                inputMode="decimal"
+                value={formData.schwab_quantity}
+                onChange={(e) =>
+                  updateFormData("schwab_quantity", Number(e.target.value) || 0)
+                }
+              />
+            </div>
 
-          {/* Call Option Enabled */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Call Option Enabled</h3>
-            <Select
-              value={formData.call_enabled.toString()}
-              onValueChange={(value) =>
-                updateFormData("call_enabled", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* TastyTrade Quantity */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">TastyTrade Quantity</Label>
+              <Input
+                className="w-full"
+                type="number"
+                min={0}
+                step="any"
+                inputMode="decimal"
+                value={formData.tastytrade_quantity}
+                onChange={(e) => {
+                  updateFormData(
+                    "tastytrade_quantity",
+                    Number(e.target.value) || 0
+                  );
+                }}
+              />
+            </div>
 
-          {/* Put Option Enabled */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Put Option Enabled</h3>
-            <Select
-              value={formData.put_enabled.toString()}
-              onValueChange={(value) =>
-                updateFormData("put_enabled", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Call Option Enabled */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm font-medium">Enable Call Options</Label>
+              <div className="flex items-center space-x-2 h-full">
+                <Switch
+                  checked={formData.call_enabled}
+                  onCheckedChange={(checked) => updateFormData("call_enabled", checked)}
+                />
+                <span className="text-sm">{formData.call_enabled ? "Enabled" : "Disabled"}</span>
+              </div>
+            </div>
+
+            {/* Put Option Enabled */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm font-medium">Enable Put Options</Label>
+              <div className="flex items-center space-x-2 h-full">
+                <Switch
+                  checked={formData.put_enabled}
+                  onCheckedChange={(checked) => updateFormData("put_enabled", checked)}
+                />
+                <span className="text-sm">{formData.put_enabled ? "Enabled" : "Disabled"}</span>
+              </div>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex gap-2">

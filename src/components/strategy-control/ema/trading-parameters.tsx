@@ -20,6 +20,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Pencil, Trash2, Check, X, Loader2Icon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { EmaTicker, timeframes } from "@/lib/ema-datas";
 import { useTrading } from "@/context/TradingContext";
 
@@ -33,7 +34,6 @@ const TradingParameters = () => {
   const {
     tickerData,
     getTickerData,
-    setTickerData,
     saveTickerData,
     deleteTickerData,
   } = useTrading();
@@ -45,14 +45,14 @@ const TradingParameters = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      await getTickerData("ema");
+      getTickerData("ema");
       setIsLoading(false);
     };
 
     fetchData();
   }, []);
 
-  const handleEdit = (row: any, idx: number) => {
+  const handleEdit = (row: EmaTicker, idx: number) => {
     setEditingIdx(idx);
     setEditRow({ ...row });
   };
@@ -70,7 +70,7 @@ const TradingParameters = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className=" ">Symbol</TableHead>
+                <TableHead className="">Symbol</TableHead>
                 <TableHead className="">Trade</TableHead>
                 <TableHead className="">TF</TableHead>
                 <TableHead className="">TL1</TableHead>
@@ -79,7 +79,7 @@ const TradingParameters = () => {
                 <TableHead className="">P2</TableHead>
                 <TableHead className="">SQty</TableHead>
                 <TableHead className="">TQty</TableHead>
-                <TableHead className=" text-right">Actions</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -110,10 +110,7 @@ const TradingParameters = () => {
                           <Select
                             value={String(editRow?.trade_enabled)}
                             onValueChange={(val) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                trade_enabled: val === "true",
-                              }))
+                              setEditRow((r) => (r ? { ...r, trade_enabled: val === "true" } : r))
                             }
                           >
                             <SelectTrigger className="w-24 text-xs">
@@ -133,10 +130,7 @@ const TradingParameters = () => {
                           <Select
                             value={editRow?.timeframe}
                             onValueChange={(val) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                timeframe: val,
-                              }))
+                              setEditRow((r) => (r ? { ...r, timeframe: val } : r))
                             }
                           >
                             <SelectTrigger className="w-24 text-xs">
@@ -159,10 +153,7 @@ const TradingParameters = () => {
                           <Select
                             value={editRow?.trend_line_1}
                             onValueChange={(val) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                trend_line_1: val,
-                              }))
+                              setEditRow((r) => (r ? { ...r, trend_line_1: val } : r))
                             }
                           >
                             <SelectTrigger className="w-full text-xs">
@@ -187,10 +178,7 @@ const TradingParameters = () => {
                             min={1}
                             value={editRow?.period_1}
                             onChange={(e) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                period_1: Number(e.target.value),
-                              }))
+                              setEditRow((r) => (r ? { ...r, period_1: Number(e.target.value) } : r))
                             }
                             className="w-20 text-xs"
                           />
@@ -199,10 +187,7 @@ const TradingParameters = () => {
                           <Select
                             value={editRow?.trend_line_2}
                             onValueChange={(val) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                trend_line_2: val,
-                              }))
+                              setEditRow((r) => (r ? { ...r, trend_line_2: val } : r))
                             }
                           >
                             <SelectTrigger className="w-full text-xs">
@@ -227,10 +212,7 @@ const TradingParameters = () => {
                             min={1}
                             value={editRow?.period_2}
                             onChange={(e) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                period_2: Number(e.target.value),
-                              }))
+                              setEditRow((r) => (r ? { ...r, period_2: Number(e.target.value) } : r))
                             }
                             className="w-20 text-xs"
                           />
@@ -242,10 +224,7 @@ const TradingParameters = () => {
                             step="any"
                             value={editRow?.schwab_quantity}
                             onChange={(e) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                schwab_quantity: Number(e.target.value),
-                              }))
+                              setEditRow((r) => (r ? { ...r, schwab_quantity: Number(e.target.value) } : r))
                             }
                             className="w-20 text-xs"
                           />
@@ -257,10 +236,7 @@ const TradingParameters = () => {
                             step="any"
                             value={editRow?.tastytrade_quantity}
                             onChange={(e) =>
-                              setEditRow((r: any) => ({
-                                ...r,
-                                tastytrade_quantity: Number(e.target.value),
-                              }))
+                              setEditRow((r) => (r ? { ...r, tastytrade_quantity: Number(e.target.value) } : r))
                             }
                             className="w-20 text-xs"
                           />
@@ -296,15 +272,17 @@ const TradingParameters = () => {
                     ) : (
                       <>
                         <TableCell>
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-semibold ${
-                              row.trade_enabled
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {row.trade_enabled ? "Enabled" : "Disabled"}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={row.trade_enabled}
+                              onCheckedChange={async (val) => {
+                                await saveTickerData({ strategy: "ema", row: { ...row, trade_enabled: val } });
+                              }}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {row.trade_enabled ? "Enabled" : "Disabled"}
+                            </span>
+                          </div>
                         </TableCell>
                         <TableCell>{row.timeframe}</TableCell>
                         <TableCell className="uppercase">

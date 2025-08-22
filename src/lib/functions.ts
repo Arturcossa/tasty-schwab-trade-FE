@@ -1,5 +1,6 @@
 import { EmaTicker } from "./ema-datas";
 import { SupertrendTicker } from "./supertrend-datas";
+import { ZerodayTicker } from "./zeroday-datas";
 
 export function formatTimeFrame(raw: string): string {
   if (raw.endsWith('h')) return `${raw.slice(0, -1)}Hour`;
@@ -40,5 +41,21 @@ export function convertBackendDataToSupertrendArray(data: Record<string, string[
     zigzag_atr_multiple: Number(values[12]),
     fibonacci_enabled: values[13].toUpperCase() === 'TRUE',
     support_demand_enabled: values[14].toUpperCase() === 'TRUE',
+  }))
+}
+
+export function convertBackendDataToZerodayArray(data: Record<string, string[]>): ZerodayTicker[] {
+  return Object.entries(data).map(([symbol, values]) => ({
+    symbol,
+    timeframe: formatTimeFrame(values[0]),
+    schwab_quantity: Number(values[1]),
+    trade_enabled: values[2].toUpperCase() === 'TRUE',
+    tastytrade_quantity: Number(values[3]),
+    trend_line_1: values[4],
+    period_1: Number(values[5]),
+    trend_line_2: values[6],
+    period_2: Number(values[7]),
+    call_enabled: values[8].toUpperCase() === 'TRUE',
+    put_enabled: values[9].toUpperCase() === 'TRUE',
   }))
 }

@@ -91,7 +91,7 @@ const AppSidebar = () => {
         <hr />
         <SidebarGroup>
           <SidebarGroupContent>
-            <PlayButtons />
+            {/* <PlayButtons /> */}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

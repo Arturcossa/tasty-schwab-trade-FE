@@ -13,10 +13,11 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 const TastySetting = () => {
-  const {user, connectionStatus, setConnectionStatus} = useAuth();
+  const {user} = useAuth();
   const { authorizationURL } = UseTastySetting();
   const [copied, setCopied] = useState(false);
   const [authorizationCode, setAuthorizationCode] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -26,7 +27,7 @@ const TastySetting = () => {
         className: "toast-success",
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast.error("Failed to copy URL", {
         className: "toast-error",
       });
@@ -47,30 +48,49 @@ const TastySetting = () => {
       const data = await res.json();
       console.log("data", data)
       if (res.ok && data.success) {
-        setConnectionStatus({
-          ...connectionStatus,
-          tasty: true,
-        });
         toast.success("Connection to Tastytrade successful!", {
           className: "toast-success",
         });
       } else {
-        setConnectionStatus({
-          ...connectionStatus,
-          tasty: false,
-        });
         toast.error(data.message || "Connection to Tastytrade failed", {
           className: "toast-error",
         });
       }
-    } catch (error) {
-      setConnectionStatus({
-        ...connectionStatus,
-        tasty: false,
-      });
+    } catch {
       toast.error("Network error during connection to Tastytrade", {
         className: "toast-error",
       });
+    }
+  }
+
+  const handleRefreshToken = async () => {
+    try {
+      setIsRefreshing(true);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasty/refresh-token`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`
+        }
+      });
+
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        toast.success("TastyTrade token refreshed successfully!", {
+          className: "toast-success",
+        });
+      } else {
+        toast.error(data.error || "Failed to refresh TastyTrade token", {
+          className: "toast-error",
+        });
+      }
+    } catch {
+      toast.error("Network error during token refresh", {
+        className: "toast-error",
+      });
+    } finally {
+      setIsRefreshing(false);
     }
   }
 
@@ -143,6 +163,23 @@ const TastySetting = () => {
             </Button>
           </div>
         </div>
+        
+        {/* Refresh Token Section */}
+        <div className="space-y-3">
+          <Label>Refresh Existing Token</Label>
+          <div className="text-sm text-muted-foreground">
+            Use your existing refresh token to get a new access token without re-authorization.
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefreshToken}
+            disabled={isRefreshing}
+          >
+            {isRefreshing ? "Refreshing..." : "Refresh Token"}
+          </Button>
+        </div>
+        
         {/* <div className="space-y-3">
           <Label htmlFor="change-password">Change Password</Label>
           <Input

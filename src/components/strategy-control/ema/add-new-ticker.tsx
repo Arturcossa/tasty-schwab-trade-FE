@@ -36,7 +36,7 @@ const AddNewTicker = () => {
   });
 
   // Update form data helper
-  const updateFormData = (field: keyof EmaTicker, value: any) => {
+  const updateFormData = <K extends keyof EmaTicker>(field: K, value: EmaTicker[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -59,6 +59,7 @@ const AddNewTicker = () => {
     if (!formData.timeframe) return "Please select a time frame";
     if (formData.period_1 < 1) return "Period 1 must be greater than 0";
     if (formData.period_2 < 1) return "Period 2 must be greater than 0";
+    if (formData.period_1 >= formData.period_2) return "Period 1 must be shorter than Period 2"
     if (formData.schwab_quantity < 0)
       return "Schwab quantity must be greater than 0";
     if (formData.tastytrade_quantity < 0)
