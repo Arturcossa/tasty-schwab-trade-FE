@@ -18,20 +18,16 @@ import {
   LayoutDashboard,
   LogOut,
   User,
-  Wifi,
-  WifiOff,
   // CirclePlay,
 } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 // import { useTrading } from "@/context/TradingContext";
-import PlayButtons from "./play-buttons";
 import { useTrading } from "@/context/TradingContext";
 
 const AppSidebar = () => {
   const pathname = usePathname();
   const { logout } = useAuth();
-  const { connectionStatus } = useTrading();
   // const { setIsOpenTokenValidModal, getConnectionTasty } = useTrading();
 
   // const handleGetSchwabToken = (api: 'schwab' | 'tasty') => {

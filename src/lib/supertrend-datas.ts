@@ -1,7 +1,13 @@
 export const symbols = [
-  'AAPL',
+  'MSTR',
   'TSLA',
-  'SPY'
+  'NVDA',
+  '/MES',
+  '/ES',
+  '/MNQ',
+  '/NQ',
+  '/M2K',
+  '/RTY',
 ]
 
 export const timeframes = [
@@ -13,9 +19,19 @@ export const timeframes = [
   "1Hour",
   "4Hour",
   "1Day",
+  "144t",
+  "288t",
+  "512t",
   "516t",
+  "703t",
+  "910t",
   "1160t",
-  "1600t"
+  "1275t",
+  "1600t",
+  "2074t",
+  "2871t",
+  "3727t",
+  "3827t"
 ]
 
 export const trendline = [

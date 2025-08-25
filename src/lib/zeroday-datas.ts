@@ -5,11 +5,25 @@ export const symbols = [
 export const timeframes = [
   "1Min",
   "2Min",
-  "3Min",
-  "4Min",
   "5Min",
   "15Min",
   "30Min",
+  "1Hour",
+  "4Hour",
+  "1Day",
+  "144t",
+  "288t",
+  "512t",
+  "516t",
+  "703t",
+  "910t",
+  "1160t",
+  "1275t",
+  "1600t",
+  "2074t",
+  "2871t",
+  "3727t",
+  "3827t"
 ]
 
 export const trendline = [
