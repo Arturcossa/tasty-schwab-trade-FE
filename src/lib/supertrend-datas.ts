@@ -34,15 +34,8 @@ export const timeframes = [
   "3827t"
 ]
 
-export const trendline = [
-  'EMA',
-  'SMA',
-  'WilderSmoother'
-]
-
 type SymbolType = typeof symbols[number]
 type TimeFrameType = typeof timeframes[number]
-type TrendlineType = typeof trendline[number]
 
 export type SupertrendTicker = {
   symbol: SymbolType;
@@ -50,21 +43,5 @@ export type SupertrendTicker = {
   timeframe: TimeFrameType;
   schwab_quantity: number;
   tastytrade_quantity: number;
-  
-  short_ma_length: number,
-  short_ma_type: TrendlineType,
-  mid_ma_length: number,
-  mid_ma_type: TrendlineType,
-  long_ma_length: number,
-  long_ma_type: TrendlineType,
-
-  zigzag_percent_reversal: number,
-  atr_length: number,
-  zigzag_atr_multiple: number,
-
-  fibonacci_enabled: boolean,
-  support_demand_enabled: boolean,
-  // timezone: string,
-  // show_volume_bubbles: boolean,
-  // show_bubbles_price: boolean,
+  zigzag_method: "average" | "high_low";
 }

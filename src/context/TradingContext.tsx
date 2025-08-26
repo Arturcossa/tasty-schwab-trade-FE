@@ -259,7 +259,7 @@ export const TradingProvider = ({ children }: { children: ReactNode }) => {
           className: "toast-error",
         });
       }
-    } catch (error) {
+    } catch {
       toast.error(`Network error`, {
         className: "toast-error",
       });

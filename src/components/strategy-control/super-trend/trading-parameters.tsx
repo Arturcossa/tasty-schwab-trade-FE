@@ -24,12 +24,6 @@ import { Switch } from "@/components/ui/switch";
 import { SupertrendTicker, timeframes } from "@/lib/supertrend-datas";
 import { useTrading } from "@/context/TradingContext";
 
-const trendlineOptions = [
-  { value: "EMA", label: "EMA" },
-  { value: "SMA", label: "SMA" },
-  { value: "WilderSmoother", label: "Wilder Smoother" },
-];
-
 const TradingParameters = () => {
   const { tickerData, getTickerData, saveTickerData, deleteTickerData } =
     useTrading();
@@ -46,6 +40,7 @@ const TradingParameters = () => {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEdit = (row: SupertrendTicker, idx: number) => {
@@ -72,20 +67,7 @@ const TradingParameters = () => {
                   <TableHead>TF</TableHead>
                   <TableHead>SQty</TableHead>
                   <TableHead>TQty</TableHead>
-                  <TableHead>SML</TableHead>
-                  <TableHead>SMT</TableHead>
-                  <TableHead>MML</TableHead>
-                  <TableHead>MMT</TableHead>
-                  <TableHead>LML</TableHead>
-                  <TableHead>LMT</TableHead>
-                  <TableHead>ZigZag%</TableHead>
-                  <TableHead>ATRL</TableHead>
-                  <TableHead>ATRM</TableHead>
-                  <TableHead>Fibonacci</TableHead>
-                  <TableHead>Support/Demand</TableHead>
-                  {/* <TableHead>Timezone</TableHead>
-                  <TableHead>Show Volume Bubbles</TableHead>
-                  <TableHead>Show Price Bubbles</TableHead> */}
+                  <TableHead>ZigZag Method</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -184,181 +166,21 @@ const TradingParameters = () => {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={editRow?.short_ma_length}
-                              onChange={(e) =>
-                                setEditRow((r) => (r ? { ...r, short_ma_length: Number(e.target.value) } : r))
-                              }
-                              className="w-20 text-xs"
-                            />
-                          </TableCell>
-                          <TableCell>
                             <Select
-                              value={editRow?.short_ma_type}
+                              value={editRow?.zigzag_method}
                               onValueChange={(val) =>
-                                setEditRow((r) => (r ? { ...r, short_ma_type: val } : r))
+                                setEditRow((r) => (r ? { ...r, zigzag_method: val as "average" | "high_low" } : r))
                               }
                             >
                               <SelectTrigger className="w-full text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {trendlineOptions.map((opt) => (
-                                  <SelectItem
-                                    className="text-xs"
-                                    key={opt.value}
-                                    value={opt.value}
-                                  >
-                                    {opt.label}
-                                  </SelectItem>
-                                ))}
+                                <SelectItem value="average">Average</SelectItem>
+                                <SelectItem value="high_low">High/Low</SelectItem>
                               </SelectContent>
                             </Select>
                           </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={editRow?.mid_ma_length}
-                              onChange={(e) =>
-                                setEditRow((r) => (r ? { ...r, mid_ma_length: Number(e.target.value) } : r))
-                              }
-                              className="w-20 text-xs"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={editRow?.mid_ma_type}
-                              onValueChange={(val) =>
-                                setEditRow((r) => (r ? { ...r, mid_ma_type: val } : r))
-                              }
-                            >
-                              <SelectTrigger className="w-full text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {trendlineOptions.map((opt) => (
-                                  <SelectItem
-                                    className="text-xs"
-                                    key={opt.value}
-                                    value={opt.value}
-                                  >
-                                    {opt.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={editRow?.long_ma_length}
-                              onChange={(e) =>
-                                setEditRow((r) => (r ? { ...r, long_ma_length: Number(e.target.value) } : r))
-                              }
-                              className="w-20 text-xs"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={editRow?.long_ma_type}
-                              onValueChange={(val) =>
-                                setEditRow((r) => (r ? { ...r, long_ma_type: val } : r))
-                              }
-                            >
-                              <SelectTrigger className="w-full text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {trendlineOptions.map((opt) => (
-                                  <SelectItem
-                                    className="text-xs"
-                                    key={opt.value}
-                                    value={opt.value}
-                                  >
-                                    {opt.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={editRow?.zigzag_percent_reversal}
-                              onChange={(e) =>
-                                setEditRow((r) => (r ? { ...r, zigzag_percent_reversal: Number(e.target.value) } : r))
-                              }
-                              className="w-20 text-xs"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={editRow?.atr_length}
-                              onChange={(e) =>
-                                setEditRow((r) => (r ? { ...r, atr_length: Number(e.target.value) } : r))
-                              }
-                              className="w-20 text-xs"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={editRow?.zigzag_atr_multiple}
-                              onChange={(e) =>
-                                setEditRow((r) => (r ? { ...r, zigzag_atr_multiple: Number(e.target.value) } : r))
-                              }
-                              className="w-20 text-xs"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={String(editRow?.fibonacci_enabled)}
-                              onValueChange={(val) =>
-                                setEditRow((r) => (r ? { ...r, fibonacci_enabled: val === "true" } : r))
-                              }
-                            >
-                              <SelectTrigger className="w-24 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem className="text-xs" value="true">
-                                  Enabled
-                                </SelectItem>
-                                <SelectItem className="text-xs" value="false">
-                                  Disabled
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={String(editRow?.support_demand_enabled)}
-                              onValueChange={(val) =>
-                                setEditRow((r) => (r ? { ...r, support_demand_enabled: val === "true" } : r))
-                              }
-                            >
-                              <SelectTrigger className="w-24 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem className="text-xs" value="true">
-                                  Enabled
-                                </SelectItem>
-                                <SelectItem className="text-xs" value="false">
-                                  Disabled
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"
@@ -405,37 +227,7 @@ const TradingParameters = () => {
                           <TableCell>{row.timeframe}</TableCell>
                           <TableCell>{row.schwab_quantity}</TableCell>
                           <TableCell>{row.tastytrade_quantity}</TableCell>
-                          <TableCell>{row.short_ma_length}</TableCell>
-                          <TableCell>{row.short_ma_type}</TableCell>
-                          <TableCell>{row.mid_ma_length}</TableCell>
-                          <TableCell>{row.mid_ma_type}</TableCell>
-                          <TableCell>{row.long_ma_length}</TableCell>
-                          <TableCell>{row.long_ma_type}</TableCell>
-                          <TableCell>{row.zigzag_percent_reversal}</TableCell>
-                          <TableCell>{row.atr_length}</TableCell>
-                          <TableCell>{row.zigzag_atr_multiple}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-semibold ${
-                                row.fibonacci_enabled
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {row.fibonacci_enabled ? "Enabled" : "Disabled"}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-semibold ${
-                                row.support_demand_enabled
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {row.support_demand_enabled ? "Enabled" : "Disabled"}
-                            </span>
-                          </TableCell>
+                          <TableCell>{row.zigzag_method}</TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"

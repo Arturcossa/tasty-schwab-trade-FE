@@ -30,17 +30,7 @@ export function convertBackendDataToSupertrendArray(data: Record<string, string[
     schwab_quantity: Number(values[1]),
     trade_enabled: values[2].toUpperCase() === 'TRUE',
     tastytrade_quantity: Number(values[3]),
-    short_ma_length:Number(values[4]),
-    short_ma_type: values[5],
-    mid_ma_length: Number(values[6]),
-    mid_ma_type: values[7],
-    long_ma_length: Number(values[8]),
-    long_ma_type:values[9],
-    zigzag_percent_reversal: Number(values[10]),
-    atr_length: Number(values[11]),
-    zigzag_atr_multiple: Number(values[12]),
-    fibonacci_enabled: values[13].toUpperCase() === 'TRUE',
-    support_demand_enabled: values[14].toUpperCase() === 'TRUE',
+    zigzag_method: values[4] as "average" | "high_low",
   }))
 }
 

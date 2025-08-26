@@ -29,20 +29,7 @@ const AddNewTicker = () => {
     trade_enabled: true,
     schwab_quantity: 0,
     tastytrade_quantity: 0,
-    short_ma_length: 1,
-    short_ma_type: "EMA",
-    mid_ma_length: 1,
-    mid_ma_type: "EMA",
-    long_ma_length: 1,
-    long_ma_type: "EMA",
-    zigzag_percent_reversal: 1.0,
-    atr_length: 14,
-    zigzag_atr_multiple: 2.0,
-    fibonacci_enabled: false,
-    support_demand_enabled: false,
-    // timezone: "America/New_York",
-    // show_volume_bubbles: false,
-    // show_bubbles_price: false,
+    zigzag_method: "average",
   });
 
   // Update form data helper
@@ -50,35 +37,11 @@ const AddNewTicker = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePeriodChange = (
-    field:
-      | "short_ma_length"
-      | "mid_ma_length"
-      | "long_ma_length"
-      | "atr_length",
-    value: string
-  ) => {
-    const numValue = parseInt(value, 10);
-    if (!isNaN(numValue) && numValue > 0) {
-      updateFormData(field, numValue);
-    } else if (value === "") {
-      updateFormData(field, 1);
-    }
-  };
-
   // Form validation
   const validateForm = (): string | null => {
     if (!formData.symbol) return "Please select a symbol";
     if (!formData.timeframe) return "Please select a time frame";
-    // if (formData.period_1 < 1) return "Period 1 must be greater than 0";
-    // if (formData.period_2 < 1) return "Period 2 must be greater than 0";
-    if (formData.short_ma_length >= formData.mid_ma_length) return "Short MA must be shorter than Mid MA"
-    if (formData.mid_ma_length >= formData.long_ma_length) return "Mid MA must be shorter than Long MA"
-    if (formData.atr_length < 1) return "ATR Length must be greater than 0"
-    if (formData.schwab_quantity < 0)
-      return "Schwab quantity must be greater than 0";
-    if (formData.tastytrade_quantity < 0)
-      return "TastyTrade quantity must be greater than 0";
+
     return null;
   };
 
@@ -90,20 +53,7 @@ const AddNewTicker = () => {
       trade_enabled: true,
       schwab_quantity: 0,
       tastytrade_quantity: 0,
-      short_ma_length: 1,
-      short_ma_type: "EMA",
-      mid_ma_length: 1,
-      mid_ma_type: "EMA",
-      long_ma_length: 1,
-      long_ma_type: "EMA",
-      zigzag_percent_reversal: 1.0,
-      atr_length: 14,
-      zigzag_atr_multiple: 2.0,
-      fibonacci_enabled: false,
-      support_demand_enabled: false,
-      // timezone: "America/New_York",
-      // show_volume_bubbles: false,
-      // show_bubbles_price: false,
+      zigzag_method: "average",
     });
   };
 
@@ -228,251 +178,22 @@ const AddNewTicker = () => {
             />
           </div>
 
-          {/* Short MA Length */}
+          {/* ZigZag Method */}
           <div className="space-y-2">
-            <h3 className="font-medium text-sm">Short MA Length</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step="1"
-              inputMode="numeric"
-              value={formData.short_ma_length}
-              onChange={(e) =>
-                handlePeriodChange("short_ma_length", e.target.value)
-              }
-            />
-          </div>
-
-          {/* Short MA Type */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Short MA Type</h3>
+            <h3 className="font-medium text-sm">ZigZag Method</h3>
             <Select
-              value={formData.short_ma_type}
-              onValueChange={(value) => updateFormData("short_ma_type", value)}
+              value={formData.zigzag_method}
+              onValueChange={(value) => updateFormData("zigzag_method", value as "average" | "high_low")}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="EMA">EMA</SelectItem>
-                <SelectItem value="SMA">SMA</SelectItem>
-                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
+                <SelectItem value="average">Average</SelectItem>
+                <SelectItem value="high_low">High/Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
-          {/* Mid MA Length */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Mid MA Length</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step="1"
-              inputMode="numeric"
-              value={formData.mid_ma_length}
-              onChange={(e) =>
-                handlePeriodChange("mid_ma_length", e.target.value)
-              }
-            />
-          </div>
-
-          {/* Mid MA Type */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Mid MA Type</h3>
-            <Select
-              value={formData.mid_ma_type}
-              onValueChange={(value) => updateFormData("mid_ma_type", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="EMA">EMA</SelectItem>
-                <SelectItem value="SMA">SMA</SelectItem>
-                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Long MA Length */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Long MA Length</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step="1"
-              inputMode="numeric"
-              value={formData.long_ma_length}
-              onChange={(e) =>
-                handlePeriodChange("long_ma_length", e.target.value)
-              }
-            />
-          </div>
-
-          {/* Long MA Type */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Long MA Type</h3>
-            <Select
-              value={formData.long_ma_type}
-              onValueChange={(value) => updateFormData("long_ma_type", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="EMA">EMA</SelectItem>
-                <SelectItem value="SMA">SMA</SelectItem>
-                <SelectItem value="WilderSmoother">Wilder Smoother</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* ZigZag Reversal % */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">ZigZag Reversal %</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={formData.zigzag_percent_reversal}
-              onChange={(e) => {
-                updateFormData(
-                  "zigzag_percent_reversal",
-                  Number(e.target.value) || 0
-                );
-              }}
-            />
-          </div>
-
-          {/* ATR Length */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">ATR Length</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step="1"
-              inputMode="numeric"
-              value={formData.atr_length}
-              onChange={(e) => handlePeriodChange("atr_length", e.target.value)}
-            />
-          </div>
-
-          {/* ATR Multiple */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">ATR Multiple</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={formData.zigzag_atr_multiple}
-              onChange={(e) => {
-                updateFormData(
-                  "zigzag_atr_multiple",
-                  Number(e.target.value) || 0
-                );
-              }}
-            />
-          </div>
-
-          {/* Enable Fibonacci */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Enable Fibonacci</h3>
-            <Select
-              value={formData.fibonacci_enabled.toString()}
-              onValueChange={(value) =>
-                updateFormData("fibonacci_enabled", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Enable Support/Demand */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Enable Support/Demand</h3>
-            <Select
-              value={formData.support_demand_enabled.toString()}
-              onValueChange={(value) =>
-                updateFormData("support_demand_enabled", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Timezone */}
-          {/* <div className="space-y-2">
-            <h3 className="font-medium text-sm">Timezone</h3>
-            <Input
-              className="w-full"
-              type="number"
-              min={1}
-              step="1"
-              inputMode="numeric"
-              value={formData.timezone}
-              onChange={(e) =>
-                updateFormData("timezone", e.target.value)
-              }
-            />
-          </div> */}
-
-          {/* Show Volume Bubbles */}
-          {/* <div className="space-y-2">
-            <h3 className="font-medium text-sm">Show Volume Bubbles</h3>
-            <Select
-              value={formData.show_volume_bubbles.toString()}
-              onValueChange={(value) =>
-                updateFormData("show_volume_bubbles", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
-
-          {/* Show Price Bubbles */}
-          {/* <div className="space-y-2">
-            <h3 className="font-medium text-sm">Show Price Bubbles</h3>
-            <Select
-              value={formData.show_bubbles_price.toString()}
-              onValueChange={(value) =>
-                updateFormData("show_bubbles_price", value === "true")
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">False</SelectItem>
-                <SelectItem value="true">True</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
         </CardContent>
         <CardFooter className="flex gap-2">
           <Button
