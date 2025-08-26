@@ -28,6 +28,7 @@ export default function UseTastySetting() {
     };
 
     fetchAuthorizationURL();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { authorizationURL, setAuthorizationURL };

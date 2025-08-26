@@ -50,6 +50,7 @@ const TradingParameters = () => {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEdit = (row: EmaTicker, idx: number) => {

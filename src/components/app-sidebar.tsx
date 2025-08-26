@@ -18,22 +18,13 @@ import {
   LayoutDashboard,
   LogOut,
   User,
-  // CirclePlay,
 } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-// import { useTrading } from "@/context/TradingContext";
-import { useTrading } from "@/context/TradingContext";
 
 const AppSidebar = () => {
   const pathname = usePathname();
   const { logout } = useAuth();
-  // const { setIsOpenTokenValidModal, getConnectionTasty } = useTrading();
-
-  // const handleGetSchwabToken = (api: 'schwab' | 'tasty') => {
-  //   if (api === 'schwab') setIsOpenTokenValidModal(true)
-  //   else getConnectionTasty()
-  // }
 
   return (
     <Sidebar className="font-playfair">
