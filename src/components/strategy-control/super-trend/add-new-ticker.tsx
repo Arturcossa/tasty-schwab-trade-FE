@@ -29,7 +29,6 @@ const AddNewTicker = () => {
     trade_enabled: true,
     schwab_quantity: 0,
     tastytrade_quantity: 0,
-    zigzag_method: "average",
   });
 
   // Update form data helper
@@ -53,7 +52,6 @@ const AddNewTicker = () => {
       trade_enabled: true,
       schwab_quantity: 0,
       tastytrade_quantity: 0,
-      zigzag_method: "average",
     });
   };
 
@@ -178,22 +176,7 @@ const AddNewTicker = () => {
             />
           </div>
 
-          {/* ZigZag Method */}
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">ZigZag Method</h3>
-            <Select
-              value={formData.zigzag_method}
-              onValueChange={(value) => updateFormData("zigzag_method", value as "average" | "high_low")}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="average">Average</SelectItem>
-                <SelectItem value="high_low">High/Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          
         </CardContent>
         <CardFooter className="flex gap-2">
           <Button

@@ -43,5 +43,4 @@ export type SupertrendTicker = {
   timeframe: TimeFrameType;
   schwab_quantity: number;
   tastytrade_quantity: number;
-  zigzag_method: "average" | "high_low";
 }

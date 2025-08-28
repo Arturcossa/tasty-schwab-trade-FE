@@ -30,7 +30,6 @@ export function convertBackendDataToSupertrendArray(data: Record<string, string[
     schwab_quantity: Number(values[1]),
     trade_enabled: values[2].toUpperCase() === 'TRUE',
     tastytrade_quantity: Number(values[3]),
-    zigzag_method: values[4] as "average" | "high_low",
   }))
 }
 

@@ -67,7 +67,6 @@ const TradingParameters = () => {
                   <TableHead>TF</TableHead>
                   <TableHead>SQty</TableHead>
                   <TableHead>TQty</TableHead>
-                  <TableHead>ZigZag Method</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -165,22 +164,7 @@ const TradingParameters = () => {
                               className="w-20 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
-                            <Select
-                              value={editRow?.zigzag_method}
-                              onValueChange={(val) =>
-                                setEditRow((r) => (r ? { ...r, zigzag_method: val as "average" | "high_low" } : r))
-                              }
-                            >
-                              <SelectTrigger className="w-full text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="average">Average</SelectItem>
-                                <SelectItem value="high_low">High/Low</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
+                          
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"
@@ -227,7 +211,6 @@ const TradingParameters = () => {
                           <TableCell>{row.timeframe}</TableCell>
                           <TableCell>{row.schwab_quantity}</TableCell>
                           <TableCell>{row.tastytrade_quantity}</TableCell>
-                          <TableCell>{row.zigzag_method}</TableCell>
                           <TableCell className="text-right space-x-2">
                             <Button
                               size="icon"
