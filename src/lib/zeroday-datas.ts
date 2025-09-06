@@ -46,6 +46,4 @@ export type ZerodayTicker = {
   period_2: number;
   schwab_quantity: number;
   tastytrade_quantity: number;
-  call_enabled: boolean;
-  put_enabled: boolean;
 }

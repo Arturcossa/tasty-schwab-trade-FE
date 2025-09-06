@@ -35,8 +35,6 @@ const AddNewTicker = () => {
     period_2: 21,
     schwab_quantity: 0,
     tastytrade_quantity: 0,
-    call_enabled: true,
-    put_enabled: true,
   });
 
   // Update form data helper
@@ -69,9 +67,6 @@ const AddNewTicker = () => {
     if (formData.schwab_quantity === 0 && formData.tastytrade_quantity === 0) {
       return "At least one broker quantity must be greater than 0";
     }
-    if (!formData.call_enabled && !formData.put_enabled) {
-      return "At least one option type (Call or Put) must be enabled";
-    }
     return null;
   };
 
@@ -87,8 +82,6 @@ const AddNewTicker = () => {
       trend_line_2: "EMA",
       schwab_quantity: 0,
       tastytrade_quantity: 0,
-      call_enabled: true,
-      put_enabled: true,
     });
   };
 
@@ -262,30 +255,6 @@ const AddNewTicker = () => {
                   );
                 }}
               />
-            </div>
-
-            {/* Call Option Enabled */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium">Enable Call Options</Label>
-              <div className="flex items-center space-x-2 h-full">
-                <Switch
-                  checked={formData.call_enabled}
-                  onCheckedChange={(checked) => updateFormData("call_enabled", checked)}
-                />
-                <span className="text-sm">{formData.call_enabled ? "Enabled" : "Disabled"}</span>
-              </div>
-            </div>
-
-            {/* Put Option Enabled */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium">Enable Put Options</Label>
-              <div className="flex items-center space-x-2 h-full">
-                <Switch
-                  checked={formData.put_enabled}
-                  onCheckedChange={(checked) => updateFormData("put_enabled", checked)}
-                />
-                <span className="text-sm">{formData.put_enabled ? "Enabled" : "Disabled"}</span>
-              </div>
             </div>
           </div>
         </CardContent>

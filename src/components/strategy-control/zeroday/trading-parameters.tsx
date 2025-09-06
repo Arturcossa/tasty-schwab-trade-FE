@@ -66,22 +66,6 @@ const TradingParameters = () => {
     });
   };
 
-  const handleToggleCallEnabled = async (row: ZerodayTicker, newValue: boolean) => {
-    const updatedRow = { ...row, call_enabled: newValue };
-    await saveTickerData({
-      strategy: "zeroday",
-      row: updatedRow,
-    });
-  };
-
-  const handleTogglePutEnabled = async (row: ZerodayTicker, newValue: boolean) => {
-    const updatedRow = { ...row, put_enabled: newValue };
-    await saveTickerData({
-      strategy: "zeroday",
-      row: updatedRow,
-    });
-  };
-
   // Filter to show only SPX tickers
   const spxTickers = tickerData.zeroday?.filter(ticker => ticker.symbol === 'SPX') || [];
 
@@ -101,8 +85,6 @@ const TradingParameters = () => {
                 <TableRow>
                   <TableHead>Symbol</TableHead>
                   <TableHead>Enable</TableHead>
-                  <TableHead>Call</TableHead>
-                  <TableHead>Put</TableHead>
                   <TableHead>TF</TableHead>
                   <TableHead>MA1</TableHead>
                   <TableHead>P1</TableHead>
@@ -144,26 +126,6 @@ const TradingParameters = () => {
                           checked={row.trade_enabled}
                           onCheckedChange={(checked) => handleToggleTradeEnabled(row, checked)}
                           aria-label="Toggle trading"
-                        />
-                      </TableCell>
-
-                      {/* Call Enable Toggle */}
-                      <TableCell>
-                        <Switch
-                          checked={row.call_enabled}
-                          onCheckedChange={(checked) => handleToggleCallEnabled(row, checked)}
-                          disabled={!row.trade_enabled}
-                          aria-label="Toggle call options"
-                        />
-                      </TableCell>
-
-                      {/* Put Enable Toggle */}
-                      <TableCell>
-                        <Switch
-                          checked={row.put_enabled}
-                          onCheckedChange={(checked) => handleTogglePutEnabled(row, checked)}
-                          disabled={!row.trade_enabled}
-                          aria-label="Toggle put options"
                         />
                       </TableCell>
 
