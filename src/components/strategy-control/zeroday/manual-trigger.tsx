@@ -11,7 +11,7 @@ const ManualTrigger = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleManualTrigger = async (action: 'long' | 'short' | 'close') => {
+  const handleManualTrigger = async (action: 'put' | 'call' | 'close') => {
     if (!user?.token) {
       toast.error("Authentication required");
       return;
@@ -70,7 +70,7 @@ const ManualTrigger = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1">
             <Button
-              onClick={() => handleManualTrigger('long')}
+              onClick={() => handleManualTrigger('call')}
               disabled={isLoading}
               className={`bg-green-600 hover:bg-green-700 text-white`}
               size="lg"
@@ -80,13 +80,13 @@ const ManualTrigger = () => {
               ) : (
                 <Play className="mr-2 h-4 w-4" />
               )}
-              Long Position
+              Buy Call
             </Button>
           </div>
 
           <div className="flex flex-col gap-1">
             <Button
-              onClick={() => handleManualTrigger('short')}
+              onClick={() => handleManualTrigger('put')}
               disabled={isLoading}
               className={`bg-red-600 hover:bg-red-700 text-white`}
               size="lg"
@@ -96,7 +96,22 @@ const ManualTrigger = () => {
               ) : (
                 <Play className="mr-2 h-4 w-4" />
               )}
-              Short Position
+              Buy Put
+            </Button>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Button
+              onClick={() => handleManualTrigger('close')}
+              disabled={isLoading}
+              className={`bg-red-600 hover:bg-red-700 text-white`}
+              size="lg"
+            >
+              {isLoading ? (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Close Position
             </Button>
           </div>
         </div>
