@@ -44,7 +44,5 @@ export function convertBackendDataToZerodayArray(data: Record<string, string[]>)
     period_1: Number(values[5]),
     trend_line_2: values[6],
     period_2: Number(values[7]),
-    call_enabled: values[8].toUpperCase() === 'TRUE',
-    put_enabled: values[9].toUpperCase() === 'TRUE',
   }))
 }

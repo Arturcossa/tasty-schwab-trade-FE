@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -36,17 +36,20 @@ const SchwabSetting = () => {
 
   const handleGenerateAccessToken = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/schwab/access-token`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`
-        },
-        body: JSON.stringify({authorizationLink})
-      })
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/schwab/access-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+          body: JSON.stringify({ authorizationLink }),
+        }
+      );
 
       const data = await res.json();
-      console.log("data", data)
+      console.log("data", data);
       if (res.ok && data.success) {
         toast.success("Connection to Schwab successful!", {
           className: "toast-success",
@@ -61,27 +64,30 @@ const SchwabSetting = () => {
         className: "toast-error",
       });
     }
-  }
+  };
 
   const handleRefreshToken = async () => {
     try {
       setIsRefreshing(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasty/refresh-token`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/schwab/refresh-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
         }
-      });
+      );
 
       const data = await res.json();
-      
+
       if (res.ok && data.success) {
-        toast.success("TastyTrade token refreshed successfully!", {
+        toast.success("Charles Schwab token refreshed successfully!", {
           className: "toast-success",
         });
       } else {
-        toast.error(data.error || "Failed to refresh TastyTrade token", {
+        toast.error(data.error || "Failed to refresh Charles Schwab token", {
           className: "toast-error",
         });
       }
@@ -92,7 +98,7 @@ const SchwabSetting = () => {
     } finally {
       setIsRefreshing(false);
     }
-  }
+  };
 
   return (
     <Card className="bg-gradient-surface border-border min-w-[400px]">
@@ -149,7 +155,12 @@ const SchwabSetting = () => {
               onChange={(e) => setAuthorizationLink(e.target.value)}
               className="bg-background border-border flex-1"
             />
-            <Button variant="secondary" size="sm" onClick={handleGenerateAccessToken}>
+            <Button
+              size="sm"
+              onClick={handleGenerateAccessToken}
+              disabled={authorizationLink == "" ? true : false}
+              className={authorizationLink == "" ? "bg-gray-700 text-white" : "bg-white text-black"}
+            >
               Generate new Access Token
             </Button>
           </div>

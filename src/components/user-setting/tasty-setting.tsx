@@ -13,7 +13,7 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 const TastySetting = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const { authorizationURL } = UseTastySetting();
   const [copied, setCopied] = useState(false);
   const [authorizationCode, setAuthorizationCode] = useState<string>("");
@@ -36,17 +36,20 @@ const TastySetting = () => {
 
   const handleGetNewToken = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasty/access-token`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`
-        },
-        body: JSON.stringify({authorizationCode})
-      })
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasty/access-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+          body: JSON.stringify({ authorizationCode }),
+        }
+      );
 
       const data = await res.json();
-      console.log("data", data)
+      console.log("data", data);
       if (res.ok && data.success) {
         toast.success("Connection to Tastytrade successful!", {
           className: "toast-success",
@@ -61,21 +64,24 @@ const TastySetting = () => {
         className: "toast-error",
       });
     }
-  }
+  };
 
   const handleRefreshToken = async () => {
     try {
       setIsRefreshing(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasty/refresh-token`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasty/refresh-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
         }
-      });
+      );
 
       const data = await res.json();
-      
+
       if (res.ok && data.success) {
         toast.success("TastyTrade token refreshed successfully!", {
           className: "toast-success",
@@ -92,7 +98,7 @@ const TastySetting = () => {
     } finally {
       setIsRefreshing(false);
     }
-  }
+  };
 
   return (
     <Card className="bg-gradient-surface border-border min-w-[400px]">
@@ -158,28 +164,39 @@ const TastySetting = () => {
               onChange={(e) => setAuthorizationCode(e.target.value)}
               className="bg-background border-border flex-1"
             />
-            <Button variant="secondary" size="sm" onClick={handleGetNewToken}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleGetNewToken}
+              disabled={authorizationCode == "" ? true : false}
+              className={
+                authorizationCode == ""
+                  ? "bg-gray-700 text-white"
+                  : "bg-white text-black"
+              }
+            >
               Get new tokens
             </Button>
           </div>
         </div>
-        
+
         {/* Refresh Token Section */}
         <div className="space-y-3">
           <Label>Refresh Existing Token</Label>
           <div className="text-sm text-muted-foreground">
-            Use your existing refresh token to get a new access token without re-authorization.
+            Use your existing refresh token to get a new access token without
+            re-authorization.
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleRefreshToken}
             disabled={isRefreshing}
           >
             {isRefreshing ? "Refreshing..." : "Refresh Token"}
           </Button>
         </div>
-        
+
         {/* <div className="space-y-3">
           <Label htmlFor="change-password">Change Password</Label>
           <Input
