@@ -4,16 +4,16 @@ A sophisticated web-based trading control panel built with Next.js, providing re
 
 ## 📸 Screenshots
 
-![Login Overview](https://raw.githubusercontent.com/0x0Zeus/tasty-schwab-trader-FE/master/screenshots/login.png)
+![Login Overview](./screenshots/login.png)
 *Secure login interface with modern design*
 
-![EMA Overview](https://raw.githubusercontent.com/0x0Zeus/tasty-schwab-trader-FE/master/screenshots/EMA.png)
+![EMA Overview](./screenshots/EMA.png)
 *EMA Crossover strategy configuration interface*
 
-![SPX Configuration](https://raw.githubusercontent.com/0x0Zeus/tasty-schwab-trader-FE/master/screenshots/SPX.png)
+![SPX Configuration](./screenshots/SPX.png)
 *SPX 0DTE options trading configuration*
 
-![Setting Interface](https://raw.githubusercontent.com/0x0Zeus/tasty-schwab-trader-FE/master/screenshots/setting.png)
+![Setting Interface](./screenshots/setting.png)
 *User settings and account management interface*
 
 ## 🎯 Key Features
